@@ -8,7 +8,7 @@ To use this addon, use commands:
 **/spyinggnome**
 
 The addon is a configurable buff checker for your raids. This addon will only work, if you're in a raid group.
-To use the raid chat announcements, it requires you to be either Raid Leader or Raid Officer.
+To use the addon, you must be either Raid Leader or Raid Officer.
 
 You always get a print out in chat, regardless of settings:
 
