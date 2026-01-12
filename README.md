@@ -86,8 +86,6 @@ You may contact me in-game or through Discord:
 <summary>List of accepted Elixirs</summary>
 <ul><li> Elixir of the Mongoose</li>
 <li> Elixir of the Sages</li>
-<li> Spirit of Zanza</li>
-<li> Elixir of Brute Force</li>
 <li> Elixir of Shadow Power</li>
 <li> Elixir of Greater Firepower</li>
 <li> Elixir of the Giants</li>
