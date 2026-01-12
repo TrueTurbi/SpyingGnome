@@ -11,6 +11,7 @@ The addon is a configurable buff checker for your raids. This addon will only wo
 To use the raid chat announcements, it requires you to be either Raid Leader or Raid Officer.
 
 You always get a print out in chat, regardless of settings:
+
 <img width="272" height="35" alt="image" src="https://github.com/user-attachments/assets/24bb80cc-733b-4518-bd18-04b84ff9fc37" />
 
 And if you check the two top boxes, you can do a check with a raid chat announcement by using the button or ready check in /sg:
