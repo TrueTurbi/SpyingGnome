@@ -37,10 +37,9 @@ After clicking the button in /sg:
 If some flasks are missing from the list, contact me below!
 Any suggestions for improvements are welcome!
 
-You may contact me in-game or through Discord
+You may contact me in-game or through Discord:
 
-In-game: Mightbeard
-
-Discord: Turbi
+**In-game:** Mightbeard
+**Discord:** Turbi
 
 **Happy raiding!**
