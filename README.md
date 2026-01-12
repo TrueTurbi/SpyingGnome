@@ -21,7 +21,7 @@ You always get a print out in chat (Unless you have "SpyingGnome Enabled" unchec
 
 And if you check "Enable Status Report Printing in Raid Chat" and "Print to raid chat after a ready check", you can do a check with a raid chat announcement by using the button or ready check in /sg:
 
-<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/89710374-12e3-4997-a487-4793504f1109" />
+<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/b7574c19-5aa2-425b-b8af-35832a4d20c0" />
 
 Button in /sg:
 
@@ -33,11 +33,20 @@ Ready check status print after ready check is complete:
 
 I also added protection potions, to check if everyone has pre-potted. Added all protection types for possible future-proofing:
 
-<img width="287" height="251" alt="image" src="https://github.com/user-attachments/assets/9786b9bd-9286-461c-b750-ecb2169b6896" />
+<img width="229" height="206" alt="image" src="https://github.com/user-attachments/assets/c539dd27-fd28-4fde-a590-87d13b5e2d53" />
+<img width="264" height="34" alt="image" src="https://github.com/user-attachments/assets/daa4f397-d771-45fe-ba98-62c42e7119fe" />
 
 After clicking the button in /sg:
 
 <img width="409" height="36" alt="image" src="https://github.com/user-attachments/assets/0c54fd6c-a6ea-4f3d-9272-9be33573b6b5" />
+
+Now also supporting Elixirs:
+
+<img width="222" height="75" alt="image" src="https://github.com/user-attachments/assets/699afc76-2735-475f-a805-35bba0194058" />
+
+With a new report, if Elixir check enabled _(It will count Elixir towards Flasks, if enabled.)_:
+
+<img width="379" height="38" alt="image" src="https://github.com/user-attachments/assets/e6539479-7843-44c0-9fc3-4035486c3f8f" />
 
 # Contact
 
