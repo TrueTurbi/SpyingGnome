@@ -4,7 +4,7 @@ Flask/Food/Prot buff checker for Project Epoch.
 <img width="436" height="674" alt="image" src="https://github.com/user-attachments/assets/aed72d21-f580-443f-906b-b99000a0b325" />
 
 To use this addon, use commands:
-**/sg**
+**/sg**,
 **/spyinggnome**
 
 The addon is a configurable buff checker for your raids. This addon will only work, if you're in a raid group.
