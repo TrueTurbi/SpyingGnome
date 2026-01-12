@@ -31,7 +31,7 @@ Ready check status print after ready check is complete:
 
 <img width="420" height="114" alt="image" src="https://github.com/user-attachments/assets/f6e370ea-13fc-4dd8-b272-8e654892334a" />
 
-I also added protection potions, to check if everyone has pre-potted. Added all protection types for possible future use:
+I also added protection potions, to check if everyone has pre-potted. Added all protection types for possible future-proofing:
 
 <img width="287" height="251" alt="image" src="https://github.com/user-attachments/assets/9786b9bd-9286-461c-b750-ecb2169b6896" />
 
