@@ -52,7 +52,7 @@ You may contact me in-game or through Discord:
 
 **Happy raiding!**
 
-**Credits/Special Thanks for providing assistance:** Norelenilia, Skarr, Kerian, Kazlyn, Kybalion
+**Credits/Special Thanks for providing assistance:** Norelenilia, Skarr, Kerian, Kazlyn, Kybalion & Kezan Community Discord
 
 # SpyingGnome v1.1
 - Adjustments to the UI, added a "Enable SpyingGnome" checkbox.
