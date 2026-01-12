@@ -47,6 +47,7 @@ You may contact me in-game or through Discord:
 
 # SpyingGnome v1.1
 - Adjustments to the UI, added an "Enable SpyingGnome" checkbox.
+
 ![Ascension_Wa9TZMbCPY](https://github.com/user-attachments/assets/bb61cf61-a810-46d0-b3f0-27351072f694)
 
 - Updated debug print/raid chat print logic, now checks for Raid Leader / Raid Officer status.
