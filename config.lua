@@ -147,8 +147,8 @@ local function buildUI()
 				if addon.db[key] ~= nil then
 					check:SetChecked(addon.db[key])
 				end
-			end
-		end
+	end
+end
 		
 		-- Update button state based on master switch
 		if uiElements.checkButton and uiElements.enableSpyingGnome then
@@ -223,8 +223,12 @@ local function buildUI()
 	checkFlasks:SetPoint("TOPLEFT", statusPrint, "BOTTOMLEFT", -10, -4)
 	uiElements.checkFlasks = checkFlasks
 
+	local checkElixirs = newCheckbox("Check for missing elixirs", "checkElixirs", false, contentFrame)
+	checkElixirs:SetPoint("TOPLEFT", checkFlasks, "BOTTOMLEFT", 10, -1)
+	uiElements.checkElixirs = checkElixirs
+
 	local checkFood = newCheckbox("Check for missing food buff", "checkFood", false, contentFrame)
-	checkFood:SetPoint("TOPLEFT", checkFlasks, "BOTTOMLEFT", 0, -4)
+	checkFood:SetPoint("TOPLEFT", checkElixirs, "BOTTOMLEFT", -10, -4)
 	uiElements.checkFood = checkFood
 
 	local checkProtection = newCheckbox("Check for missing protection buffs", "checkProtection", false, contentFrame)
@@ -254,6 +258,22 @@ local function buildUI()
 	local checkHoly = newCheckbox("Holy Protection", "checkHoly", true, contentFrame)
 	checkHoly:SetPoint("TOPLEFT", checkNature, "BOTTOMLEFT", 0, -1)
 	uiElements.checkHoly = checkHoly
+
+	-- Add handler to checkFlasks to uncheck checkElixirs when parent is unchecked
+	local originalFlasksOnClick = checkFlasks:GetScript("OnClick")
+	checkFlasks:SetScript("OnClick", function(self, button, down)
+		-- Call original handler first
+		if originalFlasksOnClick then
+			originalFlasksOnClick(self, button, down)
+		end
+		-- If parent is now unchecked, uncheck checkElixirs
+		if not self:GetChecked() then
+			if checkElixirs and addon and addon.db then
+				checkElixirs:SetChecked(false)
+				addon.db.checkElixirs = false
+			end
+		end
+	end)
 
 	-- Add handler to parent checkbox to uncheck all protection checkboxes when parent is unchecked
 	local originalProtectionOnClick = checkProtection:GetScript("OnClick")
@@ -299,10 +319,26 @@ local function buildUI()
 		end)
 	end
 
+	-- Make checkElixirs dependent on checkFlasks
+	local originalElixirsOnClick = checkElixirs:GetScript("OnClick")
+	checkElixirs:SetScript("OnClick", function(self, button, down)
+		-- Check if parent (checkFlasks) is enabled
+		if not (checkFlasks and checkFlasks:GetChecked()) then
+			-- Parent is disabled, prevent toggle by reverting state
+			self:SetChecked(not self:GetChecked())
+			return
+		end
+		-- Parent is enabled, allow normal click behavior
+		if originalElixirsOnClick then
+			originalElixirsOnClick(self, button, down)
+		end
+	end)
+
 	-- Make all checkboxes dependent on enableSpyingGnome (except enableSpyingGnome itself)
 	makeDependentOnMaster(statusPrintInRaidChat)
 	makeDependentOnMaster(statusPrint)
 	makeDependentOnMaster(checkFlasks)
+	makeDependentOnMaster(checkElixirs)
 	makeDependentOnMaster(checkFood)
 	makeDependentOnMaster(checkProtection)
 	makeDependentOnMaster(checkFire)
@@ -316,7 +352,7 @@ local function buildUI()
 	local checkButton = CreateFrame("Button", "SpyingGnomeCheckButton", contentFrame, "UIPanelButtonTemplate")
 	checkButton:SetWidth(180)
 	checkButton:SetHeight(22)
-	checkButton:SetText("Check Flasks, Food & Protection")
+	checkButton:SetText("Perform check")
 	checkButton:SetPoint("TOPLEFT", checkHoly, "BOTTOMLEFT", -10, -6)
 	uiElements.checkButton = checkButton
 
@@ -341,6 +377,7 @@ local function buildUI()
 				{box = statusPrintInRaidChat, key = "statusPrintInRaidChat"},
 				{box = statusPrint, key = "statusPrintAtReady"},
 				{box = checkFlasks, key = "checkFlasks"},
+				{box = checkElixirs, key = "checkElixirs"},
 				{box = checkFood, key = "checkFood"},
 				{box = checkProtection, key = "checkProtection"},
 				{box = checkFire, key = "checkFire"},
@@ -387,7 +424,7 @@ local function buildUI()
 	hint:SetJustifyH("CENTER")
 	hint:SetJustifyV("TOP")
 	hint:SetNonSpaceWrap(true)
-	hint:SetText("|cff44ff44Use the button above to manually check for missing flasks, food, and protection buffs.|r")
+	hint:SetText("|cff44ff44Use the button above to manually check for missing flasks, elixirs, food, and protection buffs.|r")
 	hint:Show()
 	uiElements.hint = hint
 	

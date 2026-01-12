@@ -47,6 +47,20 @@ local protections = {
 	["Holy Protection"] = true,
 }
 
+local elixirs = {
+	["Elixir of the Mongoose"] = true,
+	["Elixir of the Sages"] = true,
+	["Spirit of Zanza"] = true,
+	["Elixir of Brute Force"] = true,
+	["Shadow Power"] = true,
+	["Greater Firepower"] = true,
+	["Elixir of the Giants"] = true,
+	["Greater Intellect"] = true,
+	["Pure Arcane Power"] = true,
+	["Dazzling Light"] = true,
+	["Greater Arcane Elixir"] = true,
+}
+
 local texture = nil
 
 -- Class color table
@@ -133,6 +147,7 @@ function f:ADDON_LOADED(msg)
 		statusPrintInRaidChat = true,
 		statusPrintAtReady = true,
 		checkFlasks = true,
+		checkElixirs = false,
 		checkFood = true,
 		checkProtection = false,
 		checkFire = false,
@@ -202,13 +217,14 @@ end
 local nofood, noflask, recheck = {}, {}, {}
 local nofire, noarcane, noshadow, nofrost, nonature, noholy = {}, {}, {}, {}, {}, {}
 local function inspectUnit(unit)
-	local flask, food = nil, nil
+	local flask, food, elixir = nil, nil, nil
 	local fire, arcane, shadow, frost, nature, holy = nil, nil, nil, nil, nil, nil
 	for j = 1, 40 do
 		local name = UnitBuff(unit, j)
 		if not name then break end
 		if foods[name] then food = true end
 		if flasks[name] then flask = true end
+		if elixirs[name] then elixir = true end
 		if protections[name] then
 			if name == "Fire Protection" then fire = true
 			elseif name == "Arcane Protection" then arcane = true
@@ -220,7 +236,7 @@ local function inspectUnit(unit)
 		end
 		if food and flask and fire and arcane and shadow and frost and nature and holy then break end
 	end
-	return flask, food, fire, arcane, shadow, frost, nature, holy
+	return flask, food, elixir, fire, arcane, shadow, frost, nature, holy
 end
 local function inspectRaid()
 	-- Safety check - ensure f.db exists
@@ -239,14 +255,18 @@ local function inspectRaid()
 			
 			-- Use unit ID (raid1, raid2, etc.) instead of name for UnitBuff
 			local unitID = "raid" .. i
-			local flask, food, fire, arcane, shadow, frost, nature, holy = inspectUnit(unitID)
+			local flask, food, elixir, fire, arcane, shadow, frost, nature, holy = inspectUnit(unitID)
 			-- Only check for food if checkFood is enabled
 			if f.db.checkFood and not food then 
 				nofood[#nofood+1] = name 
 			end
 			-- Only check for flask if checkFlasks is enabled
-			if f.db.checkFlasks and not flask then 
-				noflask[#noflask+1] = name 
+			-- If checkElixirs is enabled and player has elixir, count as having flask
+			if f.db.checkFlasks then
+				local hasFlaskOrElixir = flask or (f.db.checkElixirs and elixir)
+				if not hasFlaskOrElixir then
+					noflask[#noflask+1] = name
+				end
 			end
 			-- Check for protection buffs if checkProtection is enabled
 			if f.db.checkProtection then
@@ -298,7 +318,12 @@ local function printStatusReport()
 		for i, player in next, noflask do
 			coloredFlaskList[#coloredFlaskList+1] = getColoredName(player)
 		end
-		print("Missing flask: " .. table.concat(coloredFlaskList, ", ") .. ".")
+		-- Determine message format based on checkbox states
+		local flaskMessage = "Missing flask"
+		if f.db.checkFlasks and f.db.checkElixirs then
+			flaskMessage = "Missing flask/elixir"
+		end
+		print(flaskMessage .. ": " .. table.concat(coloredFlaskList, ", ") .. ".")
 	end
 	if f.db.checkProtection then
 		if f.db.checkFire and #nofire > 0 then
@@ -356,7 +381,12 @@ local function sendStatusReportToRaidChat()
 	
 	-- Send reports for each category (sendRaidReport will check statusPrintInRaidChat)
 	if f.db.checkFlasks and #noflask > 0 then
-		sendRaidReport(noflask, "Missing Flask", false)
+		-- Determine message format based on checkbox states
+		local flaskMessage = "Missing Flask"
+		if f.db.checkFlasks and f.db.checkElixirs then
+			flaskMessage = "Missing Flask/Elixir"
+		end
+		sendRaidReport(noflask, flaskMessage, false)
 	end
 	if f.db.checkFood and #nofood > 0 then
 		sendRaidReport(nofood, "Missing Food", false)
@@ -404,15 +434,19 @@ function f:READY_CHECK_FINISHED()
 		
 		-- Only inspect if we found a valid unit ID
 		if unitID then
-			local flask, food, fire, arcane, shadow, frost, nature, holy = inspectUnit(unitID)
+			local flask, food, elixir, fire, arcane, shadow, frost, nature, holy = inspectUnit(unitID)
 			-- Only check for food if checkFood is enabled
 			-- Store plain names, printStatusReport will color them
 			if self.db.checkFood and not food then 
 				nofood[#nofood+1] = player 
 			end
 			-- Only check for flask if checkFlasks is enabled
-			if self.db.checkFlasks and not flask then 
-				noflask[#noflask+1] = player 
+			-- If checkElixirs is enabled and player has elixir, count as having flask
+			if self.db.checkFlasks then
+				local hasFlaskOrElixir = flask or (self.db.checkElixirs and elixir)
+				if not hasFlaskOrElixir then
+					noflask[#noflask+1] = player
+				end
 			end
 			-- Check for protection buffs if checkProtection is enabled
 			if self.db.checkProtection then
@@ -434,7 +468,7 @@ function f:READY_CHECK_FINISHED()
 				if self.db.checkHoly and not holy then
 					noholy[#noholy+1] = player
 				end
-			end
+	end
 		end
 	end
 	
@@ -503,7 +537,12 @@ function f:ManualCheck()
 		-- Send raid chat messages (only if checks are enabled)
 		-- Pass false to indicate this is from a manual check (not ready check)
 		if self.db.checkFlasks and #noflask > 0 then
-			sendRaidReport(noflask, "Missing Flask", false)
+			-- Determine message format based on checkbox states
+			local flaskMessage = "Missing Flask"
+			if self.db.checkFlasks and self.db.checkElixirs then
+				flaskMessage = "Missing Flask/Elixir"
+			end
+			sendRaidReport(noflask, flaskMessage, false)
 		end
 		if self.db.checkFood and #nofood > 0 then
 			sendRaidReport(nofood, "Missing Food", false)
