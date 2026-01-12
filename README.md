@@ -8,9 +8,10 @@ To use this addon, use commands:
 **/spyinggnome**
 
 The addon is a configurable buff checker for your raids. This addon will only work, if you're in a raid group.
+
 To use the addon, you must be either Raid Leader or Raid Officer.
 
-You always get a print out in chat, regardless of settings:
+You always get a print out in chat (Unless you have "SpyingGnome Enabled" unchecked):
 
 <img width="272" height="35" alt="image" src="https://github.com/user-attachments/assets/24bb80cc-733b-4518-bd18-04b84ff9fc37" />
 
@@ -43,3 +44,9 @@ You may contact me in-game or through Discord:
 **Discord:** Turbi
 
 **Happy raiding!**
+
+#SpyingGnome v1.1
+- Adjustments to the UI, added an "Enable SpyingGnome" checkbox.
+![Ascension_Wa9TZMbCPY](https://github.com/user-attachments/assets/bb61cf61-a810-46d0-b3f0-27351072f694)
+
+- Updated debug print/raid chat print logic, now checks for Raid Leader / Raid Officer status.
