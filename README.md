@@ -1,7 +1,7 @@
 # SpyingGnome
-Flask/Food/Prot buff checker for Project Epoch.
+Flask/Elixir/Food/Prot buff checker for Project Epoch.
 
-<img width="432" height="668" alt="image" src="https://github.com/user-attachments/assets/cad0b4d7-eab9-43e2-a4cd-1a91393ef321" />
+<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/29e6461a-8ea2-4823-951e-801f23392ce9" />
 
 The addon is a configurable buff checker for your raids. This addon will only work, if you're in a raid group.
 
@@ -21,7 +21,7 @@ You always get a print out in chat (Unless you have "SpyingGnome Enabled" unchec
 
 And if you check "Enable Status Report Printing in Raid Chat" and "Print to raid chat after a ready check", you can do a check with a raid chat announcement by using the button or ready check in /sg:
 
-<img width="436" height="673" alt="image" src="https://github.com/user-attachments/assets/89710374-12e3-4997-a487-4793504f1109" />
+<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/89710374-12e3-4997-a487-4793504f1109" />
 
 Button in /sg:
 
@@ -52,7 +52,31 @@ You may contact me in-game or through Discord:
 
 **Happy raiding!**
 
-**Credits/Special Thanks for providing assistance:** Norelenilia, Skarr, Kerian, Kazlyn, Kybalion & Kezan Community Discord
+**Credits/Special Thanks for providing assistance:** Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Kybalion & Kezan Community Discord
+
+# SpyingGnome v1.2
+- Added **high-end Elixirs** table as an **optional** choice, dependant "Check for missing flasks".
+- If you perform a check with Elixirs enabled, it will not print out the name in a flask check if a player has an elixir buff active.
+
+<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/e7c380b5-aa87-4174-875f-bf0e33fb6b97" />
+<img width="382" height="39" alt="image" src="https://github.com/user-attachments/assets/593300ec-c459-4cb5-add5-ea7f36799626" />
+
+<details>
+<summary>List of accepted Elixirs</summary>
+<ul><li> Elixir of the Mongoose</li>
+<li> Elixir of the Sages</li>
+<li> Spirit of Zanza</li>
+<li> Elixir of Brute Force</li>
+<li> Elixir of Shadow Power</li>
+<li> Elixir of Greater Firepower</li>
+<li> Elixir of the Giants</li>
+<li> Elixir of Greater Intellect</li>
+<li> Elixir of Pure Arcane Power</li>
+<li> Elixir of Dazzling Light</li>
+<li> Greater Arcane Elixir</li></ul>
+</details>
+
+- Updated localization to match Elixir criteria in status reports
 
 # SpyingGnome v1.1
 - Adjustments to the UI, added a "Enable SpyingGnome" checkbox.
