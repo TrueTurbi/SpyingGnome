@@ -129,9 +129,9 @@ function f:ADDON_LOADED(msg)
 	_G.SpyingGnomeDB = _G.SpyingGnomeDB or {}
 	self.db = _G.SpyingGnomeDB
 	for k, v in pairs({
+		enableSpyingGnome = true,
 		statusPrintInRaidChat = true,
 		statusPrintAtReady = true,
-		partyWithTheGnome = true,
 		checkFlasks = true,
 		checkFood = true,
 		checkProtection = false,
@@ -161,6 +161,9 @@ end
 
 local function sendRaidReport(players, reportType, isReadyCheck)
 	if #players == 0 then return end
+	
+	-- Check if SpyingGnome is enabled (master switch)
+	if not f.db.enableSpyingGnome then return end
 	
 	-- Check if raid chat printing is enabled
 	if not f.db.statusPrintInRaidChat then return end
@@ -278,7 +281,10 @@ local function inspectRaid()
 end
 
 local function printStatusReport()
-	-- Always print status reports to console with colored names
+	-- Check if SpyingGnome is enabled (master switch)
+	if not f.db.enableSpyingGnome then return end
+	
+	-- Print status reports to console with colored names
 	-- Only print if the respective check is enabled
 	if f.db.checkFood and #nofood > 0 then
 		local coloredFoodList = {}
@@ -469,7 +475,7 @@ f:SetScript("OnUpdate", function(self, elapsed)
 		self:READY_CHECK_FINISHED()
 	end
 
-	if total <= 0 and self.db.partyWithTheGnome then
+	if total <= 0 and self.db.enableSpyingGnome then
 		local rx = math.random(128, WorldFrame:GetWidth() - 128)
 		local ry = math.random(128, WorldFrame:GetHeight() - 128)
 		texture:SetPoint("CENTER", UIParent, "TOPLEFT", rx, -ry)

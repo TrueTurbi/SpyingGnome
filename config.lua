@@ -72,7 +72,7 @@ local function newCheckbox(label, key, small, parent)
 	
 	-- Set checked state
 	if addon and addon.db and addon.db[key] ~= nil then
-		check:SetChecked(addon.db[key])
+	check:SetChecked(addon.db[key])
 	else
 		check:SetChecked(false)
 	end
@@ -124,7 +124,7 @@ local function newCheckbox(label, key, small, parent)
 		end)
 	end
 	
-	-- For "Print a status report after a ready check", make it dependent on "Enable Status Report Printing in Raid Chat"
+	-- For "Print to raid chat after a ready check", make it dependent on "Enable Status Report Printing in Raid Chat"
 	-- This will be set up after both checkboxes are created
 	
 	check:Show()
@@ -149,6 +149,16 @@ local function buildUI()
 				end
 			end
 		end
+		
+		-- Update button state based on master switch
+		if uiElements.checkButton and uiElements.enableSpyingGnome then
+			if uiElements.enableSpyingGnome:GetChecked() then
+				uiElements.checkButton:SetAlpha(1.0)
+			else
+				uiElements.checkButton:SetAlpha(0.5)
+			end
+		end
+		
 		return
 	end
 	
@@ -166,11 +176,15 @@ local function buildUI()
 	subtitle:SetText("Gnomes will overrule the world. Thank you for using the addon!")
 	uiElements.subtitle = subtitle
 
+	local enableSpyingGnome = newCheckbox("Enable SpyingGnome", "enableSpyingGnome", false, contentFrame)
+	enableSpyingGnome:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
+	uiElements.enableSpyingGnome = enableSpyingGnome
+
 	local statusPrintInRaidChat = newCheckbox("Enable Status Report Printing in Raid Chat", "statusPrintInRaidChat", false, contentFrame)
-	statusPrintInRaidChat:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
+	statusPrintInRaidChat:SetPoint("TOPLEFT", enableSpyingGnome, "BOTTOMLEFT", 0, -4)
 	uiElements.statusPrintInRaidChat = statusPrintInRaidChat
 
-	local statusPrint = newCheckbox("Print a status report after a ready check", "statusPrintAtReady", true, contentFrame)
+	local statusPrint = newCheckbox("Print to raid chat after a ready check", "statusPrintAtReady", true, contentFrame)
 	statusPrint:SetPoint("TOPLEFT", statusPrintInRaidChat, "BOTTOMLEFT", 10, -1)
 	uiElements.statusPrintAtReady = statusPrint
 	
@@ -205,12 +219,8 @@ local function buildUI()
 		end
 	end)
 
-	local party = newCheckbox("Party with the gnome", "partyWithTheGnome", false, contentFrame)
-	party:SetPoint("TOPLEFT", statusPrint, "BOTTOMLEFT", -10, -3)
-	uiElements.partyWithTheGnome = party
-
 	local checkFlasks = newCheckbox("Check for missing flasks", "checkFlasks", false, contentFrame)
-	checkFlasks:SetPoint("TOPLEFT", party, "BOTTOMLEFT", 0, -4)
+	checkFlasks:SetPoint("TOPLEFT", statusPrint, "BOTTOMLEFT", -10, -4)
 	uiElements.checkFlasks = checkFlasks
 
 	local checkFood = newCheckbox("Check for missing food buff", "checkFood", false, contentFrame)
@@ -271,14 +281,95 @@ local function buildUI()
 		end
 	end)
 
+	-- Helper function to make a checkbox dependent on enableSpyingGnome
+	local function makeDependentOnMaster(checkbox)
+		if not checkbox then return end
+		local originalOnClick = checkbox:GetScript("OnClick")
+		checkbox:SetScript("OnClick", function(self, button, down)
+			-- Check if master switch is enabled
+			if not (enableSpyingGnome and enableSpyingGnome:GetChecked()) then
+				-- Master is disabled, prevent toggle by reverting state
+				self:SetChecked(not self:GetChecked())
+				return
+			end
+			-- Master is enabled, allow normal click behavior
+			if originalOnClick then
+				originalOnClick(self, button, down)
+			end
+		end)
+	end
 
-	-- Manual check button
+	-- Make all checkboxes dependent on enableSpyingGnome (except enableSpyingGnome itself)
+	makeDependentOnMaster(statusPrintInRaidChat)
+	makeDependentOnMaster(statusPrint)
+	makeDependentOnMaster(checkFlasks)
+	makeDependentOnMaster(checkFood)
+	makeDependentOnMaster(checkProtection)
+	makeDependentOnMaster(checkFire)
+	makeDependentOnMaster(checkArcane)
+	makeDependentOnMaster(checkShadow)
+	makeDependentOnMaster(checkFrost)
+	makeDependentOnMaster(checkNature)
+	makeDependentOnMaster(checkHoly)
+
+	-- Manual check button (created early so we can reference it in master switch handler)
 	local checkButton = CreateFrame("Button", "SpyingGnomeCheckButton", contentFrame, "UIPanelButtonTemplate")
 	checkButton:SetWidth(180)
 	checkButton:SetHeight(22)
 	checkButton:SetText("Check Flasks, Food & Protection")
 	checkButton:SetPoint("TOPLEFT", checkHoly, "BOTTOMLEFT", -10, -6)
+	uiElements.checkButton = checkButton
+
+	-- Add handler to master checkbox to uncheck all dependent checkboxes when unchecked
+	local originalMasterOnClick = enableSpyingGnome:GetScript("OnClick")
+	enableSpyingGnome:SetScript("OnClick", function(self, button, down)
+		-- Call original handler first
+		if originalMasterOnClick then
+			originalMasterOnClick(self, button, down)
+		end
+		-- Update button visual state
+		if checkButton then
+			if self:GetChecked() then
+				checkButton:SetAlpha(1.0)
+			else
+				checkButton:SetAlpha(0.5)
+			end
+		end
+		-- If master is now unchecked, uncheck all dependent checkboxes
+		if not self:GetChecked() then
+			local dependentBoxes = {
+				{box = statusPrintInRaidChat, key = "statusPrintInRaidChat"},
+				{box = statusPrint, key = "statusPrintAtReady"},
+				{box = checkFlasks, key = "checkFlasks"},
+				{box = checkFood, key = "checkFood"},
+				{box = checkProtection, key = "checkProtection"},
+				{box = checkFire, key = "checkFire"},
+				{box = checkArcane, key = "checkArcane"},
+				{box = checkShadow, key = "checkShadow"},
+				{box = checkFrost, key = "checkFrost"},
+				{box = checkNature, key = "checkNature"},
+				{box = checkHoly, key = "checkHoly"}
+			}
+			for _, item in ipairs(dependentBoxes) do
+				if item.box and addon and addon.db then
+					item.box:SetChecked(false)
+					addon.db[item.key] = false
+				end
+			end
+		end
+	end)
+	-- Set initial button state
+	if enableSpyingGnome:GetChecked() then
+		checkButton:SetAlpha(1.0)
+	else
+		checkButton:SetAlpha(0.5)
+	end
+
 	checkButton:SetScript("OnClick", function()
+		-- Check if SpyingGnome is enabled
+		if not (addon and addon.db and addon.db.enableSpyingGnome) then
+			return
+		end
 		if addon and addon.ManualCheck then
 			local hasIssues = addon:ManualCheck()
 			if not hasIssues then
