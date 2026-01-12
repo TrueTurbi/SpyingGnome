@@ -1,0 +1,9 @@
+## Interface: 30300
+## Title: SpyingGnome
+## Author: Turbi
+## Notes: Prints a list of people missing either flask, elixirs or food buff every ready check. Project Epoch Edition.
+## OptionalDeps: ChatThrottleLib
+## SavedVariables: SpyingGnomeDB
+
+buffs.lua
+config.lua
