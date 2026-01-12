@@ -1,44 +1,30 @@
-local flasks = {
-	["Flask of Endless Rage"] = true,
-	["Flask of Pure Mojo"] = true,
-	["Flask of Stoneblood"] = true,
-	["Flask of the Frost Wyrm"] = true,
-	["Lesser Flask of Toughness"] = true,
-	["Lesser Flask of Resistance"] = true,
-	["Flask of Arcane Fortification"] = true,
+-- Global buff tables (shared with buffconfig.lua)
+_G.SpyingGnomeFlasks = {
 	["Chromatic Resistance"] = true,
 	["Distilled Wisdom"] = true,
-	["Flask of Fortification"] = true,
-	["Flask of Mighty Restoration"] = true,
-	["Flask of Relentless Assault"] = true,
-	["Flask of Shadow Fortification"] = true,
-	["Supreme Power"] = true,
-	["Flask of Pure Death"] = true,
 	["Flask of the Titans"] = true,
-	["Supreme Power of Shattrath"] = true,
-	["Fortification of Shattrath"] = true,
-	["Mighty Restoration of Shattrath"] = true,
-	["Relentless Assault of Shattrath"] = true,
-	["Pure Death of Shattrath"] = true,
-	["Blinding Light of Shattrath"] = true,
-	["Unstable Flask of the Bandit"] = true,
-	["Unstable Flask of the Beast"] = true,
-	["Unstable Flask of the Elder"] = true,
-	["Unstable Flask of the Sorcerer"] = true,
-	["Unstable Flask of the Soldier"] = true,
-	["Unstable Flask of the Physician"] = true,
-	["Overwhelming Might"] = true,
 	["Flask of Overwhelming Might"] = true,
 	["Flask of Supreme Power"] = true,
-	["Flask of the North"] = true,
 }
 
-local foods = {
+-- Mapping for buffs that check multiple names (config name -> array of actual buff names)
+_G.SpyingGnomeBuffAliases = {
+	["Flask of Overwhelming Might"] = {
+		["Flask of Overwhelming Might"] = true,
+		["Overwhelming Might"] = true,
+	},
+	["Flask of Supreme Power"] = {
+		["Flask of Supreme Power"] = true,
+		["Supreme Power"] = true,
+	},
+}
+
+_G.SpyingGnomeFoods = {
 	["Well Fed"] = true,
 	["\"Well Fed\""] = true,
 }
 
-local protections = {
+_G.SpyingGnomeProtections = {
 	["Fire Protection"] = true,
 	["Arcane Protection"] = true,
 	["Shadow Protection"] = true,
@@ -47,11 +33,9 @@ local protections = {
 	["Holy Protection"] = true,
 }
 
-local elixirs = {
+_G.SpyingGnomeElixirs = {
 	["Elixir of the Mongoose"] = true,
 	["Elixir of the Sages"] = true,
-	["Spirit of Zanza"] = true,
-	["Elixir of Brute Force"] = true,
 	["Shadow Power"] = true,
 	["Greater Firepower"] = true,
 	["Elixir of the Giants"] = true,
@@ -60,6 +44,13 @@ local elixirs = {
 	["Dazzling Light"] = true,
 	["Greater Arcane Elixir"] = true,
 }
+
+-- Local references for convenience
+local flasks = _G.SpyingGnomeFlasks
+local foods = _G.SpyingGnomeFoods
+local protections = _G.SpyingGnomeProtections
+local elixirs = _G.SpyingGnomeElixirs
+local buffAliases = _G.SpyingGnomeBuffAliases or {}
 
 local texture = nil
 
@@ -150,16 +141,21 @@ function f:ADDON_LOADED(msg)
 		checkElixirs = false,
 		checkFood = true,
 		checkProtection = false,
-		checkFire = false,
-		checkArcane = false,
-		checkShadow = false,
-		checkFrost = false,
-		checkNature = false,
-		checkHoly = false,
 	}) do
 		if type(self.db[k]) == "nil" then
 			self.db[k] = v
 		end
+	end
+	
+	-- Initialize enabled buffs tables (will be populated by buffconfig.lua, but initialize as empty tables here)
+	if not self.db.enabledFlasks then
+		self.db.enabledFlasks = {}
+	end
+	if not self.db.enabledElixirs then
+		self.db.enabledElixirs = {}
+	end
+	if not self.db.enabledProtections then
+		self.db.enabledProtections = {}
 	end
 
 	local t = UIParent:CreateTexture("SpyingGnomeSalute", "OVERLAY")
@@ -223,9 +219,29 @@ local function inspectUnit(unit)
 		local name = UnitBuff(unit, j)
 		if not name then break end
 		if foods[name] then food = true end
-		if flasks[name] then flask = true end
-		if elixirs[name] then elixir = true end
-		if protections[name] then
+		-- Check if flask is enabled in database (default to true if not set)
+		-- First check direct match
+		if flasks[name] and (not f.db.enabledFlasks or f.db.enabledFlasks[name] ~= false) then 
+			flask = true 
+		end
+		-- Then check aliases (e.g., "Flask of Overwhelming Might" also matches "Overwhelming Might")
+		-- This allows checking for EITHER name when the config name is enabled
+		if not flask then
+			for configName, aliasTable in pairs(buffAliases) do
+				-- Check if the current buff name is in the alias table for this config name
+				if aliasTable[name] then
+					-- Check if the config name is in the flasks table and enabled
+					if flasks[configName] and (not f.db.enabledFlasks or f.db.enabledFlasks[configName] ~= false) then
+						flask = true
+						break
+					end
+				end
+			end
+		end
+		-- Check if elixir is enabled in database (default to true if not set)
+		if elixirs[name] and (not f.db.enabledElixirs or f.db.enabledElixirs[name] ~= false) then elixir = true end
+		-- Check if protection is enabled in database (default to false if not set)
+		if protections[name] and f.db.enabledProtections and f.db.enabledProtections[name] == true then
 			if name == "Fire Protection" then fire = true
 			elseif name == "Arcane Protection" then arcane = true
 			elseif name == "Shadow Protection" then shadow = true
@@ -270,30 +286,36 @@ local function inspectRaid()
 			end
 			-- Check for protection buffs if checkProtection is enabled
 			if f.db.checkProtection then
-				if f.db.checkFire and not fire then
+				if f.db.enabledProtections and f.db.enabledProtections["Fire Protection"] and not fire then
 					nofire[#nofire+1] = name
 				end
-				if f.db.checkArcane and not arcane then
+				if f.db.enabledProtections and f.db.enabledProtections["Arcane Protection"] and not arcane then
 					noarcane[#noarcane+1] = name
 				end
-				if f.db.checkShadow and not shadow then
+				if f.db.enabledProtections and f.db.enabledProtections["Shadow Protection"] and not shadow then
 					noshadow[#noshadow+1] = name
 				end
-				if f.db.checkFrost and not frost then
+				if f.db.enabledProtections and f.db.enabledProtections["Frost Protection"] and not frost then
 					nofrost[#nofrost+1] = name
 				end
-				if f.db.checkNature and not nature then
+				if f.db.enabledProtections and f.db.enabledProtections["Nature Protection"] and not nature then
 					nonature[#nonature+1] = name
 				end
-				if f.db.checkHoly and not holy then
+				if f.db.enabledProtections and f.db.enabledProtections["Holy Protection"] and not holy then
 					noholy[#noholy+1] = name
 				end
 			end
 			-- Add to recheck if any check is missing (and their check is enabled)
-			if (f.db.checkFood and not food) or (f.db.checkFlasks and not flask) or 
-			   (f.db.checkProtection and ((f.db.checkFire and not fire) or (f.db.checkArcane and not arcane) or 
-			    (f.db.checkShadow and not shadow) or (f.db.checkFrost and not frost) or 
-			    (f.db.checkNature and not nature) or (f.db.checkHoly and not holy))) then 
+			local hasMissingProtection = false
+			if f.db.checkProtection and f.db.enabledProtections then
+				hasMissingProtection = ((f.db.enabledProtections["Fire Protection"] and not fire) or 
+				                        (f.db.enabledProtections["Arcane Protection"] and not arcane) or 
+				                        (f.db.enabledProtections["Shadow Protection"] and not shadow) or 
+				                        (f.db.enabledProtections["Frost Protection"] and not frost) or 
+				                        (f.db.enabledProtections["Nature Protection"] and not nature) or 
+				                        (f.db.enabledProtections["Holy Protection"] and not holy))
+			end
+			if (f.db.checkFood and not food) or (f.db.checkFlasks and not flask) or hasMissingProtection then 
 				recheck[#recheck+1] = name 
 			end
 		end
@@ -325,43 +347,43 @@ local function printStatusReport()
 		end
 		print(flaskMessage .. ": " .. table.concat(coloredFlaskList, ", ") .. ".")
 	end
-	if f.db.checkProtection then
-		if f.db.checkFire and #nofire > 0 then
+	if f.db.checkProtection and f.db.enabledProtections then
+		if f.db.enabledProtections["Fire Protection"] and #nofire > 0 then
 			local coloredList = {}
 			for i, player in next, nofire do
 				coloredList[#coloredList+1] = getColoredName(player)
 			end
 			print("Missing Fire Protection: " .. table.concat(coloredList, ", ") .. ".")
 		end
-		if f.db.checkArcane and #noarcane > 0 then
+		if f.db.enabledProtections["Arcane Protection"] and #noarcane > 0 then
 			local coloredList = {}
 			for i, player in next, noarcane do
 				coloredList[#coloredList+1] = getColoredName(player)
 			end
 			print("Missing Arcane Protection: " .. table.concat(coloredList, ", ") .. ".")
 		end
-		if f.db.checkShadow and #noshadow > 0 then
+		if f.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
 			local coloredList = {}
 			for i, player in next, noshadow do
 				coloredList[#coloredList+1] = getColoredName(player)
 			end
 			print("Missing Shadow Protection: " .. table.concat(coloredList, ", ") .. ".")
 		end
-		if f.db.checkFrost and #nofrost > 0 then
+		if f.db.enabledProtections["Frost Protection"] and #nofrost > 0 then
 			local coloredList = {}
 			for i, player in next, nofrost do
 				coloredList[#coloredList+1] = getColoredName(player)
 			end
 			print("Missing Frost Protection: " .. table.concat(coloredList, ", ") .. ".")
 		end
-		if f.db.checkNature and #nonature > 0 then
+		if f.db.enabledProtections["Nature Protection"] and #nonature > 0 then
 			local coloredList = {}
 			for i, player in next, nonature do
 				coloredList[#coloredList+1] = getColoredName(player)
 			end
 			print("Missing Nature Protection: " .. table.concat(coloredList, ", ") .. ".")
 		end
-		if f.db.checkHoly and #noholy > 0 then
+		if f.db.enabledProtections["Holy Protection"] and #noholy > 0 then
 			local coloredList = {}
 			for i, player in next, noholy do
 				coloredList[#coloredList+1] = getColoredName(player)
@@ -391,23 +413,23 @@ local function sendStatusReportToRaidChat()
 	if f.db.checkFood and #nofood > 0 then
 		sendRaidReport(nofood, "Missing Food", false)
 	end
-	if f.db.checkProtection then
-		if f.db.checkFire and #nofire > 0 then
+	if f.db.checkProtection and f.db.enabledProtections then
+		if f.db.enabledProtections["Fire Protection"] and #nofire > 0 then
 			sendRaidReport(nofire, "Missing Fire Protection", false)
 		end
-		if f.db.checkArcane and #noarcane > 0 then
+		if f.db.enabledProtections["Arcane Protection"] and #noarcane > 0 then
 			sendRaidReport(noarcane, "Missing Arcane Protection", false)
 		end
-		if f.db.checkShadow and #noshadow > 0 then
+		if f.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
 			sendRaidReport(noshadow, "Missing Shadow Protection", false)
 		end
-		if f.db.checkFrost and #nofrost > 0 then
+		if f.db.enabledProtections["Frost Protection"] and #nofrost > 0 then
 			sendRaidReport(nofrost, "Missing Frost Protection", false)
 		end
-		if f.db.checkNature and #nonature > 0 then
+		if f.db.enabledProtections["Nature Protection"] and #nonature > 0 then
 			sendRaidReport(nonature, "Missing Nature Protection", false)
 		end
-		if f.db.checkHoly and #noholy > 0 then
+		if f.db.enabledProtections["Holy Protection"] and #noholy > 0 then
 			sendRaidReport(noholy, "Missing Holy Protection", false)
 		end
 	end
@@ -449,26 +471,26 @@ function f:READY_CHECK_FINISHED()
 				end
 			end
 			-- Check for protection buffs if checkProtection is enabled
-			if self.db.checkProtection then
-				if self.db.checkFire and not fire then
+			if self.db.checkProtection and self.db.enabledProtections then
+				if self.db.enabledProtections["Fire Protection"] and not fire then
 					nofire[#nofire+1] = player
 				end
-				if self.db.checkArcane and not arcane then
+				if self.db.enabledProtections["Arcane Protection"] and not arcane then
 					noarcane[#noarcane+1] = player
 				end
-				if self.db.checkShadow and not shadow then
+				if self.db.enabledProtections["Shadow Protection"] and not shadow then
 					noshadow[#noshadow+1] = player
 				end
-				if self.db.checkFrost and not frost then
+				if self.db.enabledProtections["Frost Protection"] and not frost then
 					nofrost[#nofrost+1] = player
 				end
-				if self.db.checkNature and not nature then
+				if self.db.enabledProtections["Nature Protection"] and not nature then
 					nonature[#nonature+1] = player
 				end
-				if self.db.checkHoly and not holy then
+				if self.db.enabledProtections["Holy Protection"] and not holy then
 					noholy[#noholy+1] = player
 				end
-	end
+			end
 		end
 	end
 	
@@ -547,23 +569,23 @@ function f:ManualCheck()
 		if self.db.checkFood and #nofood > 0 then
 			sendRaidReport(nofood, "Missing Food", false)
 		end
-		if self.db.checkProtection then
-			if self.db.checkFire and #nofire > 0 then
+		if self.db.checkProtection and self.db.enabledProtections then
+			if self.db.enabledProtections["Fire Protection"] and #nofire > 0 then
 				sendRaidReport(nofire, "Missing Fire Protection", false)
 			end
-			if self.db.checkArcane and #noarcane > 0 then
+			if self.db.enabledProtections["Arcane Protection"] and #noarcane > 0 then
 				sendRaidReport(noarcane, "Missing Arcane Protection", false)
 			end
-			if self.db.checkShadow and #noshadow > 0 then
+			if self.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
 				sendRaidReport(noshadow, "Missing Shadow Protection", false)
 			end
-			if self.db.checkFrost and #nofrost > 0 then
+			if self.db.enabledProtections["Frost Protection"] and #nofrost > 0 then
 				sendRaidReport(nofrost, "Missing Frost Protection", false)
 			end
-			if self.db.checkNature and #nonature > 0 then
+			if self.db.enabledProtections["Nature Protection"] and #nonature > 0 then
 				sendRaidReport(nonature, "Missing Nature Protection", false)
 			end
-			if self.db.checkHoly and #noholy > 0 then
+			if self.db.enabledProtections["Holy Protection"] and #noholy > 0 then
 				sendRaidReport(noholy, "Missing Holy Protection", false)
 			end
 		end
@@ -573,10 +595,16 @@ function f:ManualCheck()
 	printStatusReport()
 	
 	-- Return true if we found any issues
-	return (self.db.checkFlasks and #noflask > 0) or (self.db.checkFood and #nofood > 0) or
-	       (self.db.checkProtection and ((self.db.checkFire and #nofire > 0) or (self.db.checkArcane and #noarcane > 0) or
-	        (self.db.checkShadow and #noshadow > 0) or (self.db.checkFrost and #nofrost > 0) or
-	        (self.db.checkNature and #nonature > 0) or (self.db.checkHoly and #noholy > 0)))
+	local hasMissingProtection = false
+	if self.db.checkProtection and self.db.enabledProtections then
+		hasMissingProtection = ((self.db.enabledProtections["Fire Protection"] and #nofire > 0) or 
+		                        (self.db.enabledProtections["Arcane Protection"] and #noarcane > 0) or
+		                        (self.db.enabledProtections["Shadow Protection"] and #noshadow > 0) or 
+		                        (self.db.enabledProtections["Frost Protection"] and #nofrost > 0) or
+		                        (self.db.enabledProtections["Nature Protection"] and #nonature > 0) or 
+		                        (self.db.enabledProtections["Holy Protection"] and #noholy > 0))
+	end
+	return (self.db.checkFlasks and #noflask > 0) or (self.db.checkFood and #nofood > 0) or hasMissingProtection
 end
 
 _G.SpyingGnome = f

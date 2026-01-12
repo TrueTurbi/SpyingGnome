@@ -97,33 +97,6 @@ local function newCheckbox(label, key, small, parent)
 		end
 	end
 	
-	-- For protection checkboxes, add click handler to prevent toggling when parent is disabled
-	local protectionKeys = {"checkFire", "checkArcane", "checkShadow", "checkFrost", "checkNature", "checkHoly"}
-	local isProtectionKey = false
-	for _, protKey in ipairs(protectionKeys) do
-		if key == protKey then
-			isProtectionKey = true
-			break
-		end
-	end
-	
-	if isProtectionKey then
-		-- Hook OnClick to prevent toggling if parent is disabled
-		local originalOnClick = check:GetScript("OnClick")
-		check:SetScript("OnClick", function(self, button, down)
-			-- Check if protection checking is enabled
-			if not (addon and addon.db and addon.db.checkProtection) then
-				-- Parent is disabled, prevent toggle by reverting state
-				self:SetChecked(not self:GetChecked())
-				return
-			end
-			-- Parent is enabled, allow normal click behavior
-			if originalOnClick then
-				originalOnClick(self, button, down)
-			end
-		end)
-	end
-	
 	-- For "Print to raid chat after a ready check", make it dependent on "Enable Status Report Printing in Raid Chat"
 	-- This will be set up after both checkboxes are created
 	
@@ -176,8 +149,24 @@ end
 	subtitle:SetText("Gnomes will overrule the world. Thank you for using the addon!")
 	uiElements.subtitle = subtitle
 
+	-- Configuration button (moved to top and centered)
+	local configButton = CreateFrame("Button", "SpyingGnomeConfigButton", contentFrame, "UIPanelButtonTemplate")
+	configButton:SetWidth(180)
+	configButton:SetHeight(22)
+	configButton:SetText("Configuration")
+	-- Center horizontally on contentFrame, position vertically below subtitle
+	configButton:SetPoint("TOP", contentFrame, "TOP", 0, -60)
+	configButton:SetScript("OnClick", function()
+		if _G.SpyingGnomeToggleBuffConfig then
+			_G.SpyingGnomeToggleBuffConfig()
+		else
+			print("SpyingGnome: Buff configuration not loaded yet. Please wait a moment and try again.")
+		end
+	end)
+	uiElements.configButton = configButton
+
 	local enableSpyingGnome = newCheckbox("Enable SpyingGnome", "enableSpyingGnome", false, contentFrame)
-	enableSpyingGnome:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
+	enableSpyingGnome:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -40)
 	uiElements.enableSpyingGnome = enableSpyingGnome
 
 	local statusPrintInRaidChat = newCheckbox("Enable Status Report Printing in Raid Chat", "statusPrintInRaidChat", false, contentFrame)
@@ -235,30 +224,6 @@ end
 	checkProtection:SetPoint("TOPLEFT", checkFood, "BOTTOMLEFT", 0, -4)
 	uiElements.checkProtection = checkProtection
 
-	local checkFire = newCheckbox("Fire Protection", "checkFire", true, contentFrame)
-	checkFire:SetPoint("TOPLEFT", checkProtection, "BOTTOMLEFT", 10, -1)
-	uiElements.checkFire = checkFire
-
-	local checkArcane = newCheckbox("Arcane Protection", "checkArcane", true, contentFrame)
-	checkArcane:SetPoint("TOPLEFT", checkFire, "BOTTOMLEFT", 0, -1)
-	uiElements.checkArcane = checkArcane
-
-	local checkShadow = newCheckbox("Shadow Protection", "checkShadow", true, contentFrame)
-	checkShadow:SetPoint("TOPLEFT", checkArcane, "BOTTOMLEFT", 0, -1)
-	uiElements.checkShadow = checkShadow
-
-	local checkFrost = newCheckbox("Frost Protection", "checkFrost", true, contentFrame)
-	checkFrost:SetPoint("TOPLEFT", checkShadow, "BOTTOMLEFT", 0, -1)
-	uiElements.checkFrost = checkFrost
-
-	local checkNature = newCheckbox("Nature Protection", "checkNature", true, contentFrame)
-	checkNature:SetPoint("TOPLEFT", checkFrost, "BOTTOMLEFT", 0, -1)
-	uiElements.checkNature = checkNature
-
-	local checkHoly = newCheckbox("Holy Protection", "checkHoly", true, contentFrame)
-	checkHoly:SetPoint("TOPLEFT", checkNature, "BOTTOMLEFT", 0, -1)
-	uiElements.checkHoly = checkHoly
-
 	-- Add handler to checkFlasks to uncheck checkElixirs when parent is unchecked
 	local originalFlasksOnClick = checkFlasks:GetScript("OnClick")
 	checkFlasks:SetScript("OnClick", function(self, button, down)
@@ -275,31 +240,6 @@ end
 		end
 	end)
 
-	-- Add handler to parent checkbox to uncheck all protection checkboxes when parent is unchecked
-	local originalProtectionOnClick = checkProtection:GetScript("OnClick")
-	checkProtection:SetScript("OnClick", function(self, button, down)
-		-- Call original handler first
-		if originalProtectionOnClick then
-			originalProtectionOnClick(self, button, down)
-		end
-		-- If parent is now unchecked, uncheck all protection checkboxes
-		if not self:GetChecked() then
-			local protectionBoxes = {
-				{box = checkFire, key = "checkFire"},
-				{box = checkArcane, key = "checkArcane"},
-				{box = checkShadow, key = "checkShadow"},
-				{box = checkFrost, key = "checkFrost"},
-				{box = checkNature, key = "checkNature"},
-				{box = checkHoly, key = "checkHoly"}
-			}
-			for _, item in ipairs(protectionBoxes) do
-				if item.box and addon and addon.db then
-					item.box:SetChecked(false)
-					addon.db[item.key] = false
-				end
-			end
-		end
-	end)
 
 	-- Helper function to make a checkbox dependent on enableSpyingGnome
 	local function makeDependentOnMaster(checkbox)
@@ -341,19 +281,20 @@ end
 	makeDependentOnMaster(checkElixirs)
 	makeDependentOnMaster(checkFood)
 	makeDependentOnMaster(checkProtection)
-	makeDependentOnMaster(checkFire)
-	makeDependentOnMaster(checkArcane)
-	makeDependentOnMaster(checkShadow)
-	makeDependentOnMaster(checkFrost)
-	makeDependentOnMaster(checkNature)
-	makeDependentOnMaster(checkHoly)
 
 	-- Manual check button (created early so we can reference it in master switch handler)
 	local checkButton = CreateFrame("Button", "SpyingGnomeCheckButton", contentFrame, "UIPanelButtonTemplate")
 	checkButton:SetWidth(180)
 	checkButton:SetHeight(22)
 	checkButton:SetText("Perform check")
-	checkButton:SetPoint("TOPLEFT", checkHoly, "BOTTOMLEFT", -10, -6)
+	-- Position below checkProtection, centered horizontally on contentFrame
+	-- Get the Y position from checkProtection (minimal spacing)
+	local protectionBottom = checkProtection:GetBottom()
+	local contentTop = contentFrame:GetTop()
+	local yOffset = protectionBottom - contentTop + 20
+	-- Center horizontally: contentFrame is 260px, button is 180px, so center offset is 0 (TOP anchor centers)
+	checkButton:SetPoint("TOP", contentFrame, "TOP", 0, yOffset)
+	checkButton:Show()
 	uiElements.checkButton = checkButton
 
 	-- Add handler to master checkbox to uncheck all dependent checkboxes when unchecked
@@ -379,13 +320,7 @@ end
 				{box = checkFlasks, key = "checkFlasks"},
 				{box = checkElixirs, key = "checkElixirs"},
 				{box = checkFood, key = "checkFood"},
-				{box = checkProtection, key = "checkProtection"},
-				{box = checkFire, key = "checkFire"},
-				{box = checkArcane, key = "checkArcane"},
-				{box = checkShadow, key = "checkShadow"},
-				{box = checkFrost, key = "checkFrost"},
-				{box = checkNature, key = "checkNature"},
-				{box = checkHoly, key = "checkHoly"}
+				{box = checkProtection, key = "checkProtection"}
 			}
 			for _, item in ipairs(dependentBoxes) do
 				if item.box and addon and addon.db then
@@ -419,7 +354,8 @@ end
 	uiElements.checkButton = checkButton
 
 	local hint = contentFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-	hint:SetPoint("TOPLEFT", checkButton, "BOTTOMLEFT", 0, -4)
+	hint:SetPoint("TOP", checkButton, "BOTTOM", 0, -4)
+	hint:Show()
 	hint:SetWidth(240)
 	hint:SetJustifyH("CENTER")
 	hint:SetJustifyV("TOP")
@@ -427,9 +363,32 @@ end
 	hint:SetText("|cff44ff44Use the button above to manually check for missing flasks, elixirs, food, and protection buffs.|r")
 	hint:Show()
 	uiElements.hint = hint
+
+	local configHint = contentFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+	configHint:SetPoint("TOP", hint, "BOTTOM", 0, -4)
+	configHint:SetWidth(240)
+	configHint:SetJustifyH("CENTER")
+	configHint:SetJustifyV("TOP")
+	configHint:SetNonSpaceWrap(true)
+	configHint:SetText("|cff44ff44Use the Configuration button at the top to change the consumables the addon checks.|r")
+	configHint:Show()
+	uiElements.configHint = configHint
 	
-	-- Update content frame height
-	contentFrame:SetHeight(math.abs(hint:GetBottom() - title:GetTop()) + 20)
+	-- Update content frame height to include all content (from title top to configHint bottom)
+	local titleTop = title:GetTop()
+	local configHintBottom = configHint:GetBottom()
+	-- GetBottom returns negative values, so we need to account for that
+	-- Add extra padding to ensure the green text is fully visible
+	local contentHeight = titleTop - configHintBottom + 110
+	contentFrame:SetHeight(contentHeight)
+	
+	-- Resize configFrame to match content
+	local titleBarHeight = 24
+	local scrollFrameTopPadding = 10
+	local scrollFrameBottomPadding = 15
+	local contentHeight = contentFrame:GetHeight()
+	local totalHeight = titleBarHeight + scrollFrameTopPadding + contentHeight + scrollFrameBottomPadding
+	configFrame:SetHeight(totalHeight)
 end
 
 -- Show/hide function

@@ -4,6 +4,12 @@
 ## Notes: Prints a list of people missing either flask, elixirs or food buff every ready check. Project Epoch Edition.
 ## OptionalDeps: ChatThrottleLib
 ## SavedVariables: SpyingGnomeDB
+## X-Curse-Packaged-Version: r2
+## X-Curse-Project-Name: SpyingGnome
+## X-Curse-Project-ID: spyinggnome
+## X-Curse-Repository-ID: wow/spyinggnome/mainline
 
 buffs.lua
 config.lua
+buffconfig.lua
+
