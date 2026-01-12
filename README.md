@@ -7,7 +7,7 @@ The addon is a configurable buff checker for your raids. This addon will only wo
 
 **NOTE:** Raid Chat printing is limited to Raid Leader and Raid Officer roles to avoid clutter. Only Raid Leader OR Raid Officer should have raid chat printing enabled.
 
-# Addon Usage
+# Documentation
 
 To use this addon, use commands:
 
