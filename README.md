@@ -1,7 +1,7 @@
 # SpyingGnome
-Flask/Elixir/Food/Prot buff checker for Project Epoch.
+A fully configurable Flask/Elixir/Food/Prot buff checker for Project Epoch.
 
-<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/29e6461a-8ea2-4823-951e-801f23392ce9" />
+<img width="300" height="450" alt="image" src="https://github.com/user-attachments/assets/9a9ff611-0fec-4025-87eb-e1c44558b1bf" />
 
 The addon is a configurable buff checker for your raids. This addon will only work, if you're in a raid group.
 
@@ -54,7 +54,19 @@ You may contact me in-game or through Discord:
 
 **Credits/Special Thanks for providing assistance:** Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Kybalion & Kezan Community Discord
 
-# SpyingGnome v1.2
+# SpyingGnome v1.2 / The Great Raidening
+- UI rework, added "Configuration" menu.
+
+<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/9a9ff611-0fec-4025-87eb-e1c44558b1bf" />
+
+- The addon now crossreferences everything under "Configuration" towards the checks, and checks players for said consumables. You may choose to check for certain consumables only through this.
+
+<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/d39e706f-3aaa-40c6-8bba-2e9369593e2e" />
+
+- Each consumable has a tooltip now! And a short (+XX stat) after each potion, colored.
+
+<img width="661" height="324" alt="image" src="https://github.com/user-attachments/assets/0ee58677-3691-4163-a591-7c032ad43b26" />
+
 - Added **high-end Elixirs** table as an **optional** choice, dependant "Check for missing flasks".
 - If you perform a check with Elixirs enabled, it will not print out the name in a flask check if a player has an elixir buff active.
 
