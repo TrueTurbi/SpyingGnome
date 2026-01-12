@@ -45,7 +45,7 @@ You may contact me in-game or through Discord:
 
 **Happy raiding!**
 
-#SpyingGnome v1.1
+# SpyingGnome v1.1
 - Adjustments to the UI, added an "Enable SpyingGnome" checkbox.
 ![Ascension_Wa9TZMbCPY](https://github.com/user-attachments/assets/bb61cf61-a810-46d0-b3f0-27351072f694)
 
