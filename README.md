@@ -1,7 +1,7 @@
 # SpyingGnome
 A fully configurable Flask/Elixir/Food/Prot buff checker for Project Epoch.
 
-<img width="300" height="450" alt="image" src="https://github.com/user-attachments/assets/9a9ff611-0fec-4025-87eb-e1c44558b1bf" /> <img width="300" height="450" alt="image" src="https://github.com/user-attachments/assets/d39e706f-3aaa-40c6-8bba-2e9369593e2e" />
+<img width="275" height="450" alt="image" src="https://github.com/user-attachments/assets/0cc6ded5-87d9-42a7-9e30-f0ce7be02709" /> <img width="330" height="500" alt="image" src="https://github.com/user-attachments/assets/17bd2dd6-b1d2-44c8-bca0-485f4f08f38d" />
 
 The addon is a configurable buff checker for your raids. This addon will only work, if you're in a raid group.
 
@@ -21,15 +21,19 @@ You always get a print out in chat (Unless you have "SpyingGnome Enabled" unchec
 
 And if you check "Enable Status Report Printing in Raid Chat" and "Print to raid chat after a ready check", you can do a check with a raid chat announcement by using the button or ready check in /sg:
 
-<img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/b7574c19-5aa2-425b-b8af-35832a4d20c0" />
+<img width="322" height="316" alt="image" src="https://github.com/user-attachments/assets/b7b18abc-4e71-4135-a9fc-7f9c1ae43641" />
 
 Button in /sg:
 
-<img width="432" height="67" alt="image" src="https://github.com/user-attachments/assets/8fba8790-9e76-41c9-97f2-fb48aefbca63" />
+<img width="448" height="37" alt="image" src="https://github.com/user-attachments/assets/5dfeb307-5822-4bad-896b-5b531468671a" />
 
 Ready check status print after ready check is complete:
 
-<img width="420" height="114" alt="image" src="https://github.com/user-attachments/assets/f6e370ea-13fc-4dd8-b272-8e654892334a" />
+<img width="448" height="37" alt="image" src="https://github.com/user-attachments/assets/52167c98-dc24-4f0c-9027-96cc1984da21" />
+
+Without "Enable Status Report Printing in Raid Chat" checked, pressing "Perform check":
+
+<img width="336" height="39" alt="image" src="https://github.com/user-attachments/assets/32f2981e-90ca-4452-b62f-2f252f99e72e" />
 
 I also added protection potions, to check if everyone has pre-potted. Added all protection types for possible future-proofing:
 
@@ -40,13 +44,14 @@ After clicking the button in /sg:
 
 <img width="409" height="36" alt="image" src="https://github.com/user-attachments/assets/0c54fd6c-a6ea-4f3d-9272-9be33573b6b5" />
 
-Now also supporting Elixirs:
+Now also supporting Elixirs (Battle Elixirs and Guardian Elixirs separately):
 
-<img width="222" height="75" alt="image" src="https://github.com/user-attachments/assets/699afc76-2735-475f-a805-35bba0194058" />
+<img width="264" height="79" alt="image" src="https://github.com/user-attachments/assets/81429da6-e048-451e-9964-54c6bd3d0c21" />
 
-With a new report, if Elixir check enabled _(It will count Elixir towards Flasks, if enabled.)_:
+With a new report, if Guardian and Battle Elixir check enabled:
 
-<img width="379" height="38" alt="image" src="https://github.com/user-attachments/assets/e6539479-7843-44c0-9fc3-4035486c3f8f" />
+<img width="476" height="37" alt="image" src="https://github.com/user-attachments/assets/e0dffa24-847f-411f-be0d-81ae4e930d61" />
+
 
 # Contact
 
@@ -62,6 +67,40 @@ You may contact me in-game or through Discord:
 **Happy raiding!**
 
 **Credits/Special Thanks for providing assistance:** Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Kybalion & Kezan Community Discord
+
+# SpyingGnome v1.3 (WIP)
+
+### New Features
+- **Guardian Elixirs Support**: Added separate tracking for Guardian Elixirs (Greater Intellect, Elixir of the Sages, Elixir of Superior Defense, Elixir of Fortitude)
+- **Elixir Categories**: Split elixirs into Battle Elixirs and Guardian Elixirs categories
+- **New Elixirs Added**: 
+  - Elixir of Brute Force (Battle Elixir)
+  - Elixir of Superior Defense (Guardian Elixir)
+  - Elixir of Fortitude (Guardian Elixir)
+
+### Interface Changes
+- Renamed "Check for missing elixirs" to "Check for missing Battle Elixirs"
+- Added new "Check for missing Guardian Elixirs" checkbox
+- Updated checkbox labels with proper capitalization
+- Added tooltips to Protection buffs (hover to see item details)
+
+### Message Updates
+- Debug messages now include [SG] prefix
+- Added separate messages for Battle Elixirs and Guardian Elixirs
+- Changed "Missing Flask" to "Missing flask:" in all messages
+- Updated success message: "All raiders meet the configured consumable criteria"
+- Added warning when no checks are selected: "You have not selected any checks. Check your configuration"
+- Added message when not in raid: "You are not in a raid party"
+
+### Behavior Changes
+- **Mutual Exclusivity**: Flasks and Elixirs checkboxes are now mutually exclusive - checking one automatically unchecks the other
+  - If you check "Check for missing Flasks", Battle Elixirs and Guardian Elixirs are automatically unchecked
+  - If you check "Check for missing Battle Elixirs" or "Check for missing Guardian Elixirs", Flasks is automatically unchecked
+  
+- Debug printing now respects "Enable Status Report Printing in Raid Chat" setting (prints to debug if enabled but player is not raid leader/officer)
+- Status reports print in order: Flask, Battle Elixir, Guardian Elixir, Food, Protection
+- Battle Elixirs and Guardian Elixirs are checked and reported independently
+- Success message sent to raid chat when all checks pass (raid leader/officer only)
 
 # SpyingGnome v1.2 / The Great Raidening
 - UI rework, added "Configuration" menu.
