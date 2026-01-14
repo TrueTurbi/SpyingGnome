@@ -6,13 +6,13 @@ A fully configurable consumable checker for your raids.
 
 SpyingGnome automatically checks every member of your raid group to see if they have the consumables you've configured. It can check for:
 
-- **Flasks** - The powerful 2-hour consumables (like Flask of the Titans, Flask of Supreme Power, etc.)
-- **Battle Elixirs** - Offensive elixirs that boost your damage (like Elixir of the Mongoose, Elixir of Giants, etc.)
-- **Guardian Elixirs** - Defensive elixirs that boost your survivability (like Elixir of Superior Defense, Elixir of Fortitude, etc.)
+- **Flasks** - Multi-hour consumables (like Flask of the Titans, Flask of Supreme Power, etc.)
+- **Battle Elixirs** - Elixirs tagged with "Battle Elixir" (like Elixir of the Mongoose, Elixir of Giants, etc.)
+- **Guardian Elixirs** - Elixirs tagged with "Guardian Elixir" (like Elixir of Superior Defense, Elixir of Fortitude, etc.)
 - **Food Buffs** - Any food that provides a "Well Fed" or other food-related buff
 - **Protection Potions** - Resistance potions for specific damage types (Fire, Frost, Arcane, Nature, Shadow, Holy)
 
-The addon will tell you exactly which players are missing which consumables, making it easy to ensure your raid is properly prepared.
+The addon will tell you exactly which players are missing which at least one from these consumable categories (Depending on your configuration), making it easy to ensure your raid is properly prepared.
 
 ## Getting Started
 
