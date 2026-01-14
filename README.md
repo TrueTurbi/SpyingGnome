@@ -68,7 +68,7 @@ You may contact me in-game or through Discord:
 
 **Credits/Special Thanks for providing assistance:** Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Kybalion & Kezan Community Discord
 
-# SpyingGnome v1.3 (WIP)
+# SpyingGnome v1.3
 
 ### New Features
 - **Guardian Elixirs Support**: Added separate tracking for Guardian Elixirs (Greater Intellect, Elixir of the Sages, Elixir of Superior Defense, Elixir of Fortitude)
@@ -77,6 +77,11 @@ You may contact me in-game or through Discord:
   - Elixir of Brute Force (Battle Elixir)
   - Elixir of Superior Defense (Guardian Elixir)
   - Elixir of Fortitude (Guardian Elixir)
+  - Winterfall Firewater (Battle Elixir)
+- **New Food Buffs Added**:
+  - Nightfin Soup
+  - Protein Shake
+  - Grilled Squid
 
 ### Interface Changes
 - Renamed "Check for missing elixirs" to "Check for missing Battle Elixirs"
