@@ -192,7 +192,7 @@ This message appears in raid chat (if enabled) when you're a Raid Leader or Offi
 - Elixir of the Mongoose
 - Elixir of Shadow Power
 - Elixir of Greater Firepower
-- Elixir of the Giants
+- Elixir of Giants
 - Elixir of Pure Arcane Power
 - Elixir of Dazzling Light
 - Greater Arcane Elixir
@@ -215,9 +215,9 @@ This message appears in raid chat (if enabled) when you're a Raid Leader or Offi
 
 ### Food Buffs
 - Well Fed (any food that provides this buff)
-- Nightfin Soup (Mana Regeneration)
-- Protein Shake (Strength)
-- Grilled Squid (Increased Agility)
+- Nightfin Soup
+- Protein Shake
+- Grilled Squid
 - Rumsey Rum Black Label
 
 ### Protection Potions
