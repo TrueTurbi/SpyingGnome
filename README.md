@@ -96,7 +96,6 @@ You may contact me in-game or through Discord:
 - **Mutual Exclusivity**: Flasks and Elixirs checkboxes are now mutually exclusive - checking one automatically unchecks the other
   - If you check "Check for missing Flasks", Battle Elixirs and Guardian Elixirs are automatically unchecked
   - If you check "Check for missing Battle Elixirs" or "Check for missing Guardian Elixirs", Flasks is automatically unchecked
-  
 - Debug printing now respects "Enable Status Report Printing in Raid Chat" setting (prints to debug if enabled but player is not raid leader/officer)
 - Status reports print in order: Flask, Battle Elixir, Guardian Elixir, Food, Protection
 - Battle Elixirs and Guardian Elixirs are checked and reported independently
