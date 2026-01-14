@@ -66,28 +66,35 @@ You may contact me in-game or through Discord:
 
 **Happy raiding!**
 
-**Credits/Special Thanks for providing assistance:** Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Kybalion & Kezan Community Discord
+**Special Thanks to:** Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Surcouf, Thraxeus, Eeveel, Kybalion & the Kezan Community Discord
 
 # SpyingGnome v1.3
 
 ### New Features
-- **Guardian Elixirs Support**: Added separate tracking for Guardian Elixirs (Greater Intellect, Elixir of the Sages, Elixir of Superior Defense, Elixir of Fortitude)
+- **Guardian Elixirs Support**: Added separate tracking for Guardian Elixirs
 - **Elixir Categories**: Split elixirs into Battle Elixirs and Guardian Elixirs categories
 - **New Elixirs Added**: 
   - Elixir of Brute Force (Battle Elixir)
   - Elixir of Superior Defense (Guardian Elixir)
   - Elixir of Fortitude (Guardian Elixir)
+  - Lung Juice Cocktail (Guardian Elixir)
   - Winterfall Firewater (Battle Elixir)
+  - Ground Scorpok Assay (Battle Elixir)
+  - R.O.I.D.S. (Battle Elixir)
+  - Cerebral Cortex Compound (Guardian Elixir)
+  - Gizzard Gum (Guardian Elixir)
 - **New Food Buffs Added**:
   - Nightfin Soup
   - Protein Shake
   - Grilled Squid
+- A second gnome has made an appearance! _(Thank you Surcouf!)_
 
 ### Interface Changes
 - Renamed "Check for missing elixirs" to "Check for missing Battle Elixirs"
 - Added new "Check for missing Guardian Elixirs" checkbox
 - Updated checkbox labels with proper capitalization
 - Added tooltips to Protection buffs (hover to see item details)
+- Reordered elixirs in Configuration window: Ground Scorpok Assay and R.O.I.D.S. appear at the bottom of Battle Elixirs, Cerebral Cortex Compound and Gizzard Gum appear at the bottom of Guardian Elixirs
 
 ### Message Updates
 - Debug messages now include [SG] prefix
