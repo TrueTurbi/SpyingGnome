@@ -29,12 +29,15 @@ local itemIDs = {
 	["Winterfall Firewater"] = 12820, -- Winterfall Firewater
 	["Ground Scorpok Assay"] = 8412, -- Ground Scorpok Assay (Strike of the Scorpok buff)
 	["R.O.I.D.S."] = 8410, -- R.O.I.D.S. (Rage of Ages buff)
+	["Juju Power"] = 12451, -- Juju Power (Juju Power buff)
+	["Juju Might"] = 12460, -- Juju Might (Juju Might buff)
 	-- Guardian Elixirs
 	["Elixir of Superior Defense"] = 13445, -- Elixir of Superior Defense (Greater Armor buff)
 	["Elixir of Fortitude"] = 3825, -- Elixir of Fortitude (Health II buff)
 	["Lung Juice Cocktail"] = 8411, -- Lung Juice Cocktail (Spirit of Boar buff)
 	["Cerebral Cortex Compound"] = 8423, -- Cerebral Cortex Compound (Infallible Mind buff)
 	["Gizzard Gum"] = 8424, -- Gizzard Gum (Spiritual Domination buff)
+	["Juju Guile"] = 12458, -- Juju Guile (Juju Guile buff)
 	-- Protections
 	["Arcane Protection"] = 13461, -- Greater Arcane Protection Potion
 	["Fire Protection"] = 13457, -- Greater Fire Protection Potion
@@ -66,6 +69,8 @@ local displayNames = {
 	["Winterfall Firewater"] = "Winterfall Firewater |cffff8080(+35 Attack Power, +Size)|r",
 	["Ground Scorpok Assay"] = "Ground Scorpok Assay |cff00ff00(+25 Agility)|r",
 	["R.O.I.D.S."] = "R.O.I.D.S. |cffff8080(+25 Strength)|r",
+	["Juju Power"] = "Juju Power |cffff8080(+30 Strength)|r",
+	["Juju Might"] = "Juju Might |cffff8080(+40 Attack Power)|r",
 	
 	-- Guardian Elixirs
 	["Elixir of Superior Defense"] = "Elixir of Superior Defense |cffb0b0b0(+450 Armor)|r",
@@ -73,6 +78,7 @@ local displayNames = {
 	["Lung Juice Cocktail"] = "Lung Juice Cocktail |cff00ff00(+25 Stamina)|r",
 	["Cerebral Cortex Compound"] = "Cerebral Cortex Compound |cff0070dd(+25 Intellect)|r",
 	["Gizzard Gum"] = "Gizzard Gum |cff0070dd(+25 Spirit)|r",
+	["Juju Guile"] = "Juju Guile |cff0070dd(+30 Intellect)|r",
 }
 
 -- Create main buff config frame
@@ -349,7 +355,7 @@ local function buildBuffConfigUI()
 	
 	-- Sort battle elixir names for display
 	local battleElixirNames = {}
-	local bottomElixirs = {"Ground Scorpok Assay", "R.O.I.D.S."}
+	local bottomElixirs = {"Ground Scorpok Assay", "R.O.I.D.S.", "Juju Might", "Juju Power"}
 	local bottomElixirsSet = {}
 	for _, name in ipairs(bottomElixirs) do
 		bottomElixirsSet[name] = true
@@ -387,7 +393,7 @@ local function buildBuffConfigUI()
 	
 	-- Sort guardian elixir names for display
 	local guardianElixirNames = {}
-	local bottomGuardianElixirs = {"Cerebral Cortex Compound", "Gizzard Gum"}
+	local bottomGuardianElixirs = {"Cerebral Cortex Compound", "Gizzard Gum", "Juju Guile"}
 	local bottomGuardianElixirsSet = {}
 	for _, name in ipairs(bottomGuardianElixirs) do
 		bottomGuardianElixirsSet[name] = true

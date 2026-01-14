@@ -53,6 +53,7 @@ _G.SpyingGnomeFoods = {
 	["Mana Regeneration"] = true,
 	["Strength"] = true,
 	["Increased Agility"] = true,
+	["Rumsey Rum Black Label"] = true,
 }
 
 _G.SpyingGnomeProtections = {
@@ -77,6 +78,8 @@ _G.SpyingGnomeBattleElixirs = {
 	["Winterfall Firewater"] = true,
 	["Ground Scorpok Assay"] = true,
 	["R.O.I.D.S."] = true,
+	["Juju Power"] = true,
+	["Juju Might"] = true,
 }
 
 -- Guardian Elixirs (moved from SpyingGnomeElixirs)
@@ -88,6 +91,7 @@ _G.SpyingGnomeGuardianElixirs = {
 	["Lung Juice Cocktail"] = true,
 	["Cerebral Cortex Compound"] = true,
 	["Gizzard Gum"] = true,
+	["Juju Guile"] = true,
 }
 
 -- Local references for convenience

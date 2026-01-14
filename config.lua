@@ -137,7 +137,7 @@ end
 	
 	local title = contentFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	title:SetPoint("TOPLEFT", 0, -5)
-	title:SetText("SpyingGnome")
+	title:SetText("SpyingGnome v1.3.1")
 	uiElements.title = title
 
 	local subtitle = contentFrame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
