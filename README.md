@@ -1,7 +1,7 @@
 # SpyingGnome
 A fully configurable Flask/Elixir/Food/Prot buff checker for Project Epoch.
 
-<img width="275" height="450" alt="image" src="https://github.com/user-attachments/assets/0cc6ded5-87d9-42a7-9e30-f0ce7be02709" /> <img width="330" height="500" alt="image" src="https://github.com/user-attachments/assets/17bd2dd6-b1d2-44c8-bca0-485f4f08f38d" />
+<img width="275" height="450" alt="image" src="https://github.com/user-attachments/assets/0cc6ded5-87d9-42a7-9e30-f0ce7be02709" /> <img width="330" height="500" alt="image" src="https://github.com/user-attachments/assets/f129e641-1eee-462b-bf9b-57e22844aa0e" />
 
 The addon is a configurable buff checker for your raids. This addon will only work, if you're in a raid group.
 
