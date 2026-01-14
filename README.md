@@ -246,12 +246,11 @@ Hover over any of the flasks/elixirs/protections mentioned in the Configuration 
 - Go to Configuration and check the specific flasks/elixirs/protections you want to monitor.
 
 ### Messages Not Appearing in Raid Chat
-- Make sure you're a Raid Leader or Raid Officer (regular raiders can't send to raid chat).
+- Make sure you're a Raid Leader or Raid Officer (regular raiders can't send status reports to raid chat).
 - Check that "Enable Status Report Printing in Raid Chat" is enabled.
-- Verify that "Enable SpyingGnome" is checked (the master switch).
 
 ### Messages Appearing Twice
-- This shouldn't happen, but if it does, make sure only one person in the raid has raid chat printing enabled.
+- This shouldn't happen. Please contact me below.
 
 ## Contact & Support
 
