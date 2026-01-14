@@ -17,11 +17,42 @@ _G.SpyingGnomeBuffAliases = {
 		["Flask of Supreme Power"] = true,
 		["Supreme Power"] = true,
 	},
+	["Elixir of Superior Defense"] = {
+		["Elixir of Superior Defense"] = true,
+		["Greater Armor"] = true,
+	},
+	["Elixir of Fortitude"] = {
+		["Elixir of Fortitude"] = true,
+		["Health II"] = true,
+	},
+	["Lung Juice Cocktail"] = {
+		["Lung Juice Cocktail"] = true,
+		["Spirit of Boar"] = true,
+	},
+	["Ground Scorpok Assay"] = {
+		["Ground Scorpok Assay"] = true,
+		["Strike of the Scorpok"] = true,
+	},
+	["R.O.I.D.S."] = {
+		["R.O.I.D.S."] = true,
+		["Rage of Ages"] = true,
+	},
+	["Cerebral Cortex Compound"] = {
+		["Cerebral Cortex Compound"] = true,
+		["Infallible Mind"] = true,
+	},
+	["Gizzard Gum"] = {
+		["Gizzard Gum"] = true,
+		["Spiritual Domination"] = true,
+	},
 }
 
 _G.SpyingGnomeFoods = {
 	["Well Fed"] = true,
 	["\"Well Fed\""] = true,
+	["Mana Regeneration"] = true,
+	["Strength"] = true,
+	["Increased Agility"] = true,
 }
 
 _G.SpyingGnomeProtections = {
@@ -33,26 +64,43 @@ _G.SpyingGnomeProtections = {
 	["Holy Protection"] = true,
 }
 
-_G.SpyingGnomeElixirs = {
+-- Battle Elixirs (moved from SpyingGnomeElixirs)
+_G.SpyingGnomeBattleElixirs = {
 	["Elixir of the Mongoose"] = true,
-	["Elixir of the Sages"] = true,
 	["Shadow Power"] = true,
 	["Greater Firepower"] = true,
 	["Elixir of the Giants"] = true,
-	["Greater Intellect"] = true,
 	["Pure Arcane Power"] = true,
 	["Dazzling Light"] = true,
 	["Greater Arcane Elixir"] = true,
+	["Elixir of Brute Force"] = true,
+	["Winterfall Firewater"] = true,
+	["Ground Scorpok Assay"] = true,
+	["R.O.I.D.S."] = true,
+}
+
+-- Guardian Elixirs (moved from SpyingGnomeElixirs)
+_G.SpyingGnomeGuardianElixirs = {
+	["Greater Intellect"] = true,
+	["Elixir of the Sages"] = true,
+	["Elixir of Superior Defense"] = true,
+	["Elixir of Fortitude"] = true,
+	["Lung Juice Cocktail"] = true,
+	["Cerebral Cortex Compound"] = true,
+	["Gizzard Gum"] = true,
 }
 
 -- Local references for convenience
 local flasks = _G.SpyingGnomeFlasks
 local foods = _G.SpyingGnomeFoods
 local protections = _G.SpyingGnomeProtections
-local elixirs = _G.SpyingGnomeElixirs
+local battleElixirs = _G.SpyingGnomeBattleElixirs
+local guardianElixirs = _G.SpyingGnomeGuardianElixirs
 local buffAliases = _G.SpyingGnomeBuffAliases or {}
 
 local texture = nil
+local texture2 = nil
+local currentTexture = nil
 
 -- Class color table
 local classColors = {
@@ -139,6 +187,7 @@ function f:ADDON_LOADED(msg)
 		statusPrintAtReady = true,
 		checkFlasks = true,
 		checkElixirs = false,
+		checkGuardianElixirs = false,
 		checkFood = true,
 		checkProtection = false,
 	}) do
@@ -154,6 +203,9 @@ function f:ADDON_LOADED(msg)
 	if not self.db.enabledElixirs then
 		self.db.enabledElixirs = {}
 	end
+	if not self.db.enabledGuardianElixirs then
+		self.db.enabledGuardianElixirs = {}
+	end
 	if not self.db.enabledProtections then
 		self.db.enabledProtections = {}
 	end
@@ -166,6 +218,18 @@ function f:ADDON_LOADED(msg)
 	t:SetAlpha(0)
 	t:Hide()
 	texture = t
+	
+	local t2 = UIParent:CreateTexture("SpyingGnomeSalute2", "OVERLAY")
+	t2:SetTexture("Interface\\AddOns\\SpyingGnome\\spyinggnome3")
+	t2:SetHeight(256)
+	t2:SetWidth(256)
+	t2:SetPoint("CENTER", UIParent)
+	t2:SetAlpha(0)
+	t2:Hide()
+	texture2 = t2
+	
+	-- Start with first texture
+	currentTexture = texture
 	
 	self:UnregisterEvent("ADDON_LOADED")
 end
@@ -211,9 +275,10 @@ local function sendRaidReport(players, reportType, isReadyCheck)
 end
 
 local nofood, noflask, recheck = {}, {}, {}
+local nobattleElixir, noguardianElixir = {}, {}
 local nofire, noarcane, noshadow, nofrost, nonature, noholy = {}, {}, {}, {}, {}, {}
 local function inspectUnit(unit)
-	local flask, food, elixir = nil, nil, nil
+	local flask, food, battleElixir, guardianElixir = nil, nil, nil, nil
 	local fire, arcane, shadow, frost, nature, holy = nil, nil, nil, nil, nil, nil
 	for j = 1, 40 do
 		local name = UnitBuff(unit, j)
@@ -238,8 +303,36 @@ local function inspectUnit(unit)
 				end
 			end
 		end
-		-- Check if elixir is enabled in database (default to true if not set)
-		if elixirs[name] and (not f.db.enabledElixirs or f.db.enabledElixirs[name] ~= false) then elixir = true end
+		-- Check if battle elixir is enabled in database (default to true if not set)
+		if not battleElixir then
+			if battleElixirs[name] and (not f.db.enabledElixirs or f.db.enabledElixirs[name] ~= false) then
+				battleElixir = true
+			end
+		end
+		-- Check battle elixir aliases
+		if not battleElixir then
+			for configName, aliasTable in pairs(buffAliases) do
+				if aliasTable[name] and battleElixirs[configName] and (not f.db.enabledElixirs or f.db.enabledElixirs[configName] ~= false) then
+					battleElixir = true
+					break
+				end
+			end
+		end
+		-- Check if guardian elixir is enabled in database (default to true if not set)
+		if not guardianElixir then
+			if guardianElixirs[name] and (not f.db.enabledGuardianElixirs or f.db.enabledGuardianElixirs[name] ~= false) then
+				guardianElixir = true
+			end
+		end
+		-- Check guardian elixir aliases
+		if not guardianElixir then
+			for configName, aliasTable in pairs(buffAliases) do
+				if aliasTable[name] and guardianElixirs[configName] and (not f.db.enabledGuardianElixirs or f.db.enabledGuardianElixirs[configName] ~= false) then
+					guardianElixir = true
+					break
+				end
+			end
+		end
 		-- Check if protection is enabled in database (default to false if not set)
 		if protections[name] and f.db.enabledProtections and f.db.enabledProtections[name] == true then
 			if name == "Fire Protection" then fire = true
@@ -250,9 +343,9 @@ local function inspectUnit(unit)
 			elseif name == "Holy Protection" then holy = true
 			end
 		end
-		if food and flask and fire and arcane and shadow and frost and nature and holy then break end
+		if food and flask and battleElixir and guardianElixir and fire and arcane and shadow and frost and nature and holy then break end
 	end
-	return flask, food, elixir, fire, arcane, shadow, frost, nature, holy
+	return flask, food, battleElixir, guardianElixir, fire, arcane, shadow, frost, nature, holy
 end
 local function inspectRaid()
 	-- Safety check - ensure f.db exists
@@ -261,6 +354,7 @@ local function inspectRaid()
 	-- Clear and rebuild class cache
 	wipe(playerClassCache)
 	wipe(nofood); wipe(noflask)
+	wipe(nobattleElixir); wipe(noguardianElixir)
 	wipe(nofire); wipe(noarcane); wipe(noshadow); wipe(nofrost); wipe(nonature); wipe(noholy)
 	
 	for i = 1, GetNumRaidMembers() do
@@ -271,38 +365,42 @@ local function inspectRaid()
 			
 			-- Use unit ID (raid1, raid2, etc.) instead of name for UnitBuff
 			local unitID = "raid" .. i
-			local flask, food, elixir, fire, arcane, shadow, frost, nature, holy = inspectUnit(unitID)
+			local flask, food, battleElixir, guardianElixir, fire, arcane, shadow, frost, nature, holy = inspectUnit(unitID)
 			-- Only check for food if checkFood is enabled
 			if f.db.checkFood and not food then 
 				nofood[#nofood+1] = name 
 			end
 			-- Only check for flask if checkFlasks is enabled
-			-- If checkElixirs is enabled and player has elixir, count as having flask
-			if f.db.checkFlasks then
-				local hasFlaskOrElixir = flask or (f.db.checkElixirs and elixir)
-				if not hasFlaskOrElixir then
-					noflask[#noflask+1] = name
-				end
+			if f.db.checkFlasks and not flask then
+				noflask[#noflask+1] = name
+			end
+			-- Check for Battle Elixirs separately if checkElixirs is enabled
+			if f.db.checkElixirs and not battleElixir then
+				nobattleElixir[#nobattleElixir+1] = name
+			end
+			-- Check for Guardian Elixirs separately if checkGuardianElixirs is enabled
+			if f.db.checkGuardianElixirs and not guardianElixir then
+				noguardianElixir[#noguardianElixir+1] = name
 			end
 			-- Check for protection buffs if checkProtection is enabled
 			if f.db.checkProtection then
-				if f.db.enabledProtections and f.db.enabledProtections["Fire Protection"] and not fire then
-					nofire[#nofire+1] = name
-				end
 				if f.db.enabledProtections and f.db.enabledProtections["Arcane Protection"] and not arcane then
 					noarcane[#noarcane+1] = name
 				end
-				if f.db.enabledProtections and f.db.enabledProtections["Shadow Protection"] and not shadow then
-					noshadow[#noshadow+1] = name
+				if f.db.enabledProtections and f.db.enabledProtections["Fire Protection"] and not fire then
+					nofire[#nofire+1] = name
 				end
 				if f.db.enabledProtections and f.db.enabledProtections["Frost Protection"] and not frost then
 					nofrost[#nofrost+1] = name
 				end
+				if f.db.enabledProtections and f.db.enabledProtections["Holy Protection"] and not holy then
+					noholy[#noholy+1] = name
+				end
 				if f.db.enabledProtections and f.db.enabledProtections["Nature Protection"] and not nature then
 					nonature[#nonature+1] = name
 				end
-				if f.db.enabledProtections and f.db.enabledProtections["Holy Protection"] and not holy then
-					noholy[#noholy+1] = name
+				if f.db.enabledProtections and f.db.enabledProtections["Shadow Protection"] and not shadow then
+					noshadow[#noshadow+1] = name
 				end
 			end
 			-- Add to recheck if any check is missing (and their check is enabled)
@@ -315,7 +413,7 @@ local function inspectRaid()
 				                        (f.db.enabledProtections["Nature Protection"] and not nature) or 
 				                        (f.db.enabledProtections["Holy Protection"] and not holy))
 			end
-			if (f.db.checkFood and not food) or (f.db.checkFlasks and not flask) or hasMissingProtection then 
+			if (f.db.checkFood and not food) or (f.db.checkFlasks and not flask) or (f.db.checkElixirs and not battleElixir) or (f.db.checkGuardianElixirs and not guardianElixir) or hasMissingProtection then 
 				recheck[#recheck+1] = name 
 			end
 		end
@@ -326,69 +424,192 @@ local function printStatusReport()
 	-- Check if SpyingGnome is enabled (master switch)
 	if not f.db.enableSpyingGnome then return end
 	
+	-- Check if checkboxes are enabled but no items are selected in Configuration
+	-- These configuration warnings should always print, regardless of raid chat settings
+	if f.db.checkFlasks then
+		local hasEnabledFlasks = false
+		if f.db.enabledFlasks then
+			for flaskName, _ in pairs(flasks) do
+				if f.db.enabledFlasks[flaskName] ~= false then
+					hasEnabledFlasks = true
+					break
+				end
+			end
+		end
+		if not hasEnabledFlasks then
+			print("[SG]: You have not selected any flasks to check for.")
+		end
+	end
+	
+	if f.db.checkElixirs then
+		local hasEnabledBattleElixirs = false
+		if f.db.enabledElixirs then
+			for elixirName, _ in pairs(battleElixirs) do
+				if f.db.enabledElixirs[elixirName] ~= false then
+					hasEnabledBattleElixirs = true
+					break
+				end
+			end
+		end
+		if not hasEnabledBattleElixirs then
+			print("[SG]: You have not selected any battle elixirs to check for.")
+		end
+	end
+	
+	if f.db.checkGuardianElixirs then
+		local hasEnabledGuardianElixirs = false
+		if f.db.enabledGuardianElixirs then
+			for elixirName, _ in pairs(guardianElixirs) do
+				if f.db.enabledGuardianElixirs[elixirName] ~= false then
+					hasEnabledGuardianElixirs = true
+					break
+				end
+			end
+		end
+		if not hasEnabledGuardianElixirs then
+			print("[SG]: You have not selected any guardian elixirs to check for.")
+		end
+	end
+	
+	if f.db.checkProtection then
+		local hasEnabledProtections = false
+		if f.db.enabledProtections then
+			for protName, _ in pairs(protections) do
+				if f.db.enabledProtections[protName] == true then
+					hasEnabledProtections = true
+					break
+				end
+			end
+		end
+		if not hasEnabledProtections then
+			print("[SG]: You have not selected any protection buffs to check for.")
+		end
+	end
+	
+	-- Don't print debug messages if raid chat printing is enabled AND player is raid leader/officer
+	-- If raid chat printing is enabled but player is NOT raid leader/officer, print to debug instead
+	if f.db.statusPrintInRaidChat and isRaidLeaderOrOfficer() then return end
+	
 	-- Print status reports to console with colored names
-	-- Only print if the respective check is enabled
+	-- Order: Flask, Battle Elixir, Guardian Elixir, Food, Protection
+	-- Only print if the respective check is enabled AND items are selected in Configuration
+	if f.db.checkFlasks and #noflask > 0 then
+		local hasEnabledFlasks = false
+		if f.db.enabledFlasks then
+			for flaskName, _ in pairs(flasks) do
+				if f.db.enabledFlasks[flaskName] ~= false then
+					hasEnabledFlasks = true
+					break
+				end
+			end
+		end
+		if hasEnabledFlasks then
+			local coloredFlaskList = {}
+			for i, player in next, noflask do
+				coloredFlaskList[#coloredFlaskList+1] = getColoredName(player)
+			end
+			print("[SG] Missing flask: " .. table.concat(coloredFlaskList, ", ") .. ".")
+		end
+	end
+	
+	if f.db.checkElixirs and #nobattleElixir > 0 then
+		local hasEnabledBattleElixirs = false
+		if f.db.enabledElixirs then
+			for elixirName, _ in pairs(battleElixirs) do
+				if f.db.enabledElixirs[elixirName] ~= false then
+					hasEnabledBattleElixirs = true
+					break
+				end
+			end
+		end
+		if hasEnabledBattleElixirs then
+			local coloredBattleElixirList = {}
+			for i, player in next, nobattleElixir do
+				coloredBattleElixirList[#coloredBattleElixirList+1] = getColoredName(player)
+			end
+			print("[SG] Missing Battle Elixir: " .. table.concat(coloredBattleElixirList, ", ") .. ".")
+		end
+	end
+	
+	if f.db.checkGuardianElixirs and #noguardianElixir > 0 then
+		local hasEnabledGuardianElixirs = false
+		if f.db.enabledGuardianElixirs then
+			for elixirName, _ in pairs(guardianElixirs) do
+				if f.db.enabledGuardianElixirs[elixirName] ~= false then
+					hasEnabledGuardianElixirs = true
+					break
+				end
+			end
+		end
+		if hasEnabledGuardianElixirs then
+			local coloredGuardianElixirList = {}
+			for i, player in next, noguardianElixir do
+				coloredGuardianElixirList[#coloredGuardianElixirList+1] = getColoredName(player)
+			end
+			print("[SG] Missing Guardian Elixir: " .. table.concat(coloredGuardianElixirList, ", ") .. ".")
+		end
+	end
+	
 	if f.db.checkFood and #nofood > 0 then
 		local coloredFoodList = {}
 		for i, player in next, nofood do
 			coloredFoodList[#coloredFoodList+1] = getColoredName(player)
 		end
-		print("Missing food: " .. table.concat(coloredFoodList, ", ") .. ".")
-	end
-	if f.db.checkFlasks and #noflask > 0 then
-		local coloredFlaskList = {}
-		for i, player in next, noflask do
-			coloredFlaskList[#coloredFlaskList+1] = getColoredName(player)
-		end
-		-- Determine message format based on checkbox states
-		local flaskMessage = "Missing flask"
-		if f.db.checkFlasks and f.db.checkElixirs then
-			flaskMessage = "Missing flask/elixir"
-		end
-		print(flaskMessage .. ": " .. table.concat(coloredFlaskList, ", ") .. ".")
+		print("[SG] Missing food buff: " .. table.concat(coloredFoodList, ", ") .. ".")
 	end
 	if f.db.checkProtection and f.db.enabledProtections then
-		if f.db.enabledProtections["Fire Protection"] and #nofire > 0 then
-			local coloredList = {}
-			for i, player in next, nofire do
-				coloredList[#coloredList+1] = getColoredName(player)
+		local hasEnabledProtections = false
+		if f.db.enabledProtections then
+			for protName, _ in pairs(protections) do
+				if f.db.enabledProtections[protName] == true then
+					hasEnabledProtections = true
+					break
+				end
 			end
-			print("Missing Fire Protection: " .. table.concat(coloredList, ", ") .. ".")
 		end
-		if f.db.enabledProtections["Arcane Protection"] and #noarcane > 0 then
-			local coloredList = {}
-			for i, player in next, noarcane do
-				coloredList[#coloredList+1] = getColoredName(player)
+		if hasEnabledProtections then
+			if f.db.enabledProtections["Arcane Protection"] and #noarcane > 0 then
+				local coloredList = {}
+				for i, player in next, noarcane do
+					coloredList[#coloredList+1] = getColoredName(player)
+				end
+				print("[SG] Missing Arcane Protection: " .. table.concat(coloredList, ", ") .. ".")
 			end
-			print("Missing Arcane Protection: " .. table.concat(coloredList, ", ") .. ".")
-		end
-		if f.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
-			local coloredList = {}
-			for i, player in next, noshadow do
-				coloredList[#coloredList+1] = getColoredName(player)
+			if f.db.enabledProtections["Fire Protection"] and #nofire > 0 then
+				local coloredList = {}
+				for i, player in next, nofire do
+					coloredList[#coloredList+1] = getColoredName(player)
+				end
+				print("[SG] Missing Fire Protection: " .. table.concat(coloredList, ", ") .. ".")
 			end
-			print("Missing Shadow Protection: " .. table.concat(coloredList, ", ") .. ".")
-		end
-		if f.db.enabledProtections["Frost Protection"] and #nofrost > 0 then
-			local coloredList = {}
-			for i, player in next, nofrost do
-				coloredList[#coloredList+1] = getColoredName(player)
+			if f.db.enabledProtections["Frost Protection"] and #nofrost > 0 then
+				local coloredList = {}
+				for i, player in next, nofrost do
+					coloredList[#coloredList+1] = getColoredName(player)
+				end
+				print("[SG] Missing Frost Protection: " .. table.concat(coloredList, ", ") .. ".")
 			end
-			print("Missing Frost Protection: " .. table.concat(coloredList, ", ") .. ".")
-		end
-		if f.db.enabledProtections["Nature Protection"] and #nonature > 0 then
-			local coloredList = {}
-			for i, player in next, nonature do
-				coloredList[#coloredList+1] = getColoredName(player)
+			if f.db.enabledProtections["Holy Protection"] and #noholy > 0 then
+				local coloredList = {}
+				for i, player in next, noholy do
+					coloredList[#coloredList+1] = getColoredName(player)
+				end
+				print("[SG] Missing Holy Protection: " .. table.concat(coloredList, ", ") .. ".")
 			end
-			print("Missing Nature Protection: " .. table.concat(coloredList, ", ") .. ".")
-		end
-		if f.db.enabledProtections["Holy Protection"] and #noholy > 0 then
-			local coloredList = {}
-			for i, player in next, noholy do
-				coloredList[#coloredList+1] = getColoredName(player)
+			if f.db.enabledProtections["Nature Protection"] and #nonature > 0 then
+				local coloredList = {}
+				for i, player in next, nonature do
+					coloredList[#coloredList+1] = getColoredName(player)
+				end
+				print("[SG] Missing Nature Protection: " .. table.concat(coloredList, ", ") .. ".")
 			end
-			print("Missing Holy Protection: " .. table.concat(coloredList, ", ") .. ".")
+			if f.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
+				local coloredList = {}
+				for i, player in next, noshadow do
+					coloredList[#coloredList+1] = getColoredName(player)
+				end
+				print("[SG] Missing Shadow Protection: " .. table.concat(coloredList, ", ") .. ".")
+			end
 		end
 	end
 end
@@ -402,35 +623,71 @@ local function sendStatusReportToRaidChat()
 	end
 	
 	-- Send reports for each category (sendRaidReport will check statusPrintInRaidChat)
+	-- Order: Flask, Battle Elixir, Guardian Elixir, Food, Protection
+	-- Only send if items are selected in Configuration
 	if f.db.checkFlasks and #noflask > 0 then
-		-- Determine message format based on checkbox states
-		local flaskMessage = "Missing Flask"
-		if f.db.checkFlasks and f.db.checkElixirs then
-			flaskMessage = "Missing Flask/Elixir"
+		local hasEnabledFlasks = false
+		if f.db.enabledFlasks then
+			for flaskName, _ in pairs(flasks) do
+				if f.db.enabledFlasks[flaskName] ~= false then
+					hasEnabledFlasks = true
+					break
+				end
+			end
 		end
-		sendRaidReport(noflask, flaskMessage, false)
+		if hasEnabledFlasks then
+			sendRaidReport(noflask, "Missing flask", false)
+		end
+	end
+	if f.db.checkElixirs and #nobattleElixir > 0 then
+		local hasEnabledBattleElixirs = false
+		if f.db.enabledElixirs then
+			for elixirName, _ in pairs(battleElixirs) do
+				if f.db.enabledElixirs[elixirName] ~= false then
+					hasEnabledBattleElixirs = true
+					break
+				end
+			end
+		end
+		if hasEnabledBattleElixirs then
+			sendRaidReport(nobattleElixir, "Missing Battle Elixir", false)
+		end
+	end
+	if f.db.checkGuardianElixirs and #noguardianElixir > 0 then
+		local hasEnabledGuardianElixirs = false
+		if f.db.enabledGuardianElixirs then
+			for elixirName, _ in pairs(guardianElixirs) do
+				if f.db.enabledGuardianElixirs[elixirName] ~= false then
+					hasEnabledGuardianElixirs = true
+					break
+				end
+			end
+		end
+		if hasEnabledGuardianElixirs then
+			sendRaidReport(noguardianElixir, "Missing Guardian Elixir", false)
+		end
 	end
 	if f.db.checkFood and #nofood > 0 then
-		sendRaidReport(nofood, "Missing Food", false)
+		sendRaidReport(nofood, "Missing food buff", false)
 	end
 	if f.db.checkProtection and f.db.enabledProtections then
-		if f.db.enabledProtections["Fire Protection"] and #nofire > 0 then
-			sendRaidReport(nofire, "Missing Fire Protection", false)
-		end
 		if f.db.enabledProtections["Arcane Protection"] and #noarcane > 0 then
 			sendRaidReport(noarcane, "Missing Arcane Protection", false)
 		end
-		if f.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
-			sendRaidReport(noshadow, "Missing Shadow Protection", false)
+		if f.db.enabledProtections["Fire Protection"] and #nofire > 0 then
+			sendRaidReport(nofire, "Missing Fire Protection", false)
 		end
 		if f.db.enabledProtections["Frost Protection"] and #nofrost > 0 then
 			sendRaidReport(nofrost, "Missing Frost Protection", false)
 		end
+		if f.db.enabledProtections["Holy Protection"] and #noholy > 0 then
+			sendRaidReport(noholy, "Missing Holy Protection", false)
+		end
 		if f.db.enabledProtections["Nature Protection"] and #nonature > 0 then
 			sendRaidReport(nonature, "Missing Nature Protection", false)
 		end
-		if f.db.enabledProtections["Holy Protection"] and #noholy > 0 then
-			sendRaidReport(noholy, "Missing Holy Protection", false)
+		if f.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
+			sendRaidReport(noshadow, "Missing Shadow Protection", false)
 		end
 	end
 end
@@ -441,6 +698,7 @@ function f:READY_CHECK_FINISHED()
 
 	-- Always do status report inspection and print to console (debug)
 	wipe(nofood); wipe(noflask)
+	wipe(nobattleElixir); wipe(noguardianElixir)
 	wipe(nofire); wipe(noarcane); wipe(noshadow); wipe(nofrost); wipe(nonature); wipe(noholy)
 	
 	for i, player in next, recheck do
@@ -456,39 +714,43 @@ function f:READY_CHECK_FINISHED()
 		
 		-- Only inspect if we found a valid unit ID
 		if unitID then
-			local flask, food, elixir, fire, arcane, shadow, frost, nature, holy = inspectUnit(unitID)
+			local flask, food, battleElixir, guardianElixir, fire, arcane, shadow, frost, nature, holy = inspectUnit(unitID)
 			-- Only check for food if checkFood is enabled
 			-- Store plain names, printStatusReport will color them
 			if self.db.checkFood and not food then 
 				nofood[#nofood+1] = player 
 			end
 			-- Only check for flask if checkFlasks is enabled
-			-- If checkElixirs is enabled and player has elixir, count as having flask
-			if self.db.checkFlasks then
-				local hasFlaskOrElixir = flask or (self.db.checkElixirs and elixir)
-				if not hasFlaskOrElixir then
-					noflask[#noflask+1] = player
-				end
+			if self.db.checkFlasks and not flask then
+				noflask[#noflask+1] = player
+			end
+			-- Check for Battle Elixirs separately if checkElixirs is enabled
+			if self.db.checkElixirs and not battleElixir then
+				nobattleElixir[#nobattleElixir+1] = player
+			end
+			-- Check for Guardian Elixirs separately if checkGuardianElixirs is enabled
+			if self.db.checkGuardianElixirs and not guardianElixir then
+				noguardianElixir[#noguardianElixir+1] = player
 			end
 			-- Check for protection buffs if checkProtection is enabled
 			if self.db.checkProtection and self.db.enabledProtections then
-				if self.db.enabledProtections["Fire Protection"] and not fire then
-					nofire[#nofire+1] = player
-				end
 				if self.db.enabledProtections["Arcane Protection"] and not arcane then
 					noarcane[#noarcane+1] = player
 				end
-				if self.db.enabledProtections["Shadow Protection"] and not shadow then
-					noshadow[#noshadow+1] = player
+				if self.db.enabledProtections["Fire Protection"] and not fire then
+					nofire[#nofire+1] = player
 				end
 				if self.db.enabledProtections["Frost Protection"] and not frost then
 					nofrost[#nofrost+1] = player
 				end
+				if self.db.enabledProtections["Holy Protection"] and not holy then
+					noholy[#noholy+1] = player
+				end
 				if self.db.enabledProtections["Nature Protection"] and not nature then
 					nonature[#nonature+1] = player
 				end
-				if self.db.enabledProtections["Holy Protection"] and not holy then
-					noholy[#noholy+1] = player
+				if self.db.enabledProtections["Shadow Protection"] and not shadow then
+					noshadow[#noshadow+1] = player
 				end
 			end
 		end
@@ -524,7 +786,10 @@ end
 
 local total = 0
 f:Hide()
-f:SetScript("OnHide", function() UIFrameFlashStop(texture) end)
+f:SetScript("OnHide", function() 
+	UIFrameFlashStop(texture)
+	UIFrameFlashStop(texture2)
+end)
 f:SetScript("OnUpdate", function(self, elapsed)
 
 	if GetTime()>rcTimeout then
@@ -534,8 +799,17 @@ f:SetScript("OnUpdate", function(self, elapsed)
 	if total <= 0 and self.db.enableSpyingGnome then
 		local rx = math.random(128, WorldFrame:GetWidth() - 128)
 		local ry = math.random(128, WorldFrame:GetHeight() - 128)
+		-- Position both textures at the same location
 		texture:SetPoint("CENTER", UIParent, "TOPLEFT", rx, -ry)
-		UIFrameFlash(texture, 0.5, 0.5, 1.6, false, 0.2, 0.4)
+		texture2:SetPoint("CENTER", UIParent, "TOPLEFT", rx, -ry)
+		-- Alternate between the two textures
+		if currentTexture == texture then
+			currentTexture = texture2
+		else
+			currentTexture = texture
+		end
+		-- Flash the current texture
+		UIFrameFlash(currentTexture, 0.5, 0.5, 1.6, false, 0.2, 0.4)
 		total = 1.7
 	end
 	total = total - elapsed
@@ -550,6 +824,7 @@ f:RegisterEvent("ADDON_LOADED")
 function f:ManualCheck()
 	-- Clear previous results
 	wipe(nofood); wipe(noflask); wipe(recheck)
+	wipe(nobattleElixir); wipe(noguardianElixir)
 	
 	-- Inspect the raid
 	inspectRaid()
@@ -558,35 +833,81 @@ function f:ManualCheck()
 	if isRaidLeaderOrOfficer() then
 		-- Send raid chat messages (only if checks are enabled)
 		-- Pass false to indicate this is from a manual check (not ready check)
+		-- Only send if items are selected in Configuration
 		if self.db.checkFlasks and #noflask > 0 then
-			-- Determine message format based on checkbox states
-			local flaskMessage = "Missing Flask"
-			if self.db.checkFlasks and self.db.checkElixirs then
-				flaskMessage = "Missing Flask/Elixir"
+			local hasEnabledFlasks = false
+			if self.db.enabledFlasks then
+				for flaskName, _ in pairs(flasks) do
+					if self.db.enabledFlasks[flaskName] ~= false then
+						hasEnabledFlasks = true
+						break
+					end
+				end
 			end
-			sendRaidReport(noflask, flaskMessage, false)
+			if hasEnabledFlasks then
+				sendRaidReport(noflask, "Missing flask", false)
+			end
+		end
+		if self.db.checkElixirs and #nobattleElixir > 0 then
+			local hasEnabledBattleElixirs = false
+			if self.db.enabledElixirs then
+				for elixirName, _ in pairs(battleElixirs) do
+					if self.db.enabledElixirs[elixirName] ~= false then
+						hasEnabledBattleElixirs = true
+						break
+					end
+				end
+			end
+			if hasEnabledBattleElixirs then
+				sendRaidReport(nobattleElixir, "Missing Battle Elixir", false)
+			end
+		end
+		if self.db.checkGuardianElixirs and #noguardianElixir > 0 then
+			local hasEnabledGuardianElixirs = false
+			if self.db.enabledGuardianElixirs then
+				for elixirName, _ in pairs(guardianElixirs) do
+					if self.db.enabledGuardianElixirs[elixirName] ~= false then
+						hasEnabledGuardianElixirs = true
+						break
+					end
+				end
+			end
+			if hasEnabledGuardianElixirs then
+				sendRaidReport(noguardianElixir, "Missing Guardian Elixir", false)
+			end
 		end
 		if self.db.checkFood and #nofood > 0 then
-			sendRaidReport(nofood, "Missing Food", false)
+			sendRaidReport(nofood, "Missing food buff", false)
 		end
 		if self.db.checkProtection and self.db.enabledProtections then
-			if self.db.enabledProtections["Fire Protection"] and #nofire > 0 then
-				sendRaidReport(nofire, "Missing Fire Protection", false)
+			local hasEnabledProtections = false
+			if self.db.enabledProtections then
+				for protName, _ in pairs(protections) do
+					if self.db.enabledProtections[protName] == true then
+						hasEnabledProtections = true
+						break
+					end
+				end
 			end
-			if self.db.enabledProtections["Arcane Protection"] and #noarcane > 0 then
-				sendRaidReport(noarcane, "Missing Arcane Protection", false)
-			end
-			if self.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
-				sendRaidReport(noshadow, "Missing Shadow Protection", false)
-			end
-			if self.db.enabledProtections["Frost Protection"] and #nofrost > 0 then
-				sendRaidReport(nofrost, "Missing Frost Protection", false)
-			end
-			if self.db.enabledProtections["Nature Protection"] and #nonature > 0 then
-				sendRaidReport(nonature, "Missing Nature Protection", false)
-			end
-			if self.db.enabledProtections["Holy Protection"] and #noholy > 0 then
-				sendRaidReport(noholy, "Missing Holy Protection", false)
+			if hasEnabledProtections then
+				if self.db.enabledProtections["Arcane Protection"] and #noarcane > 0 then
+					sendRaidReport(noarcane, "Missing Arcane Protection", false)
+				end
+				if self.db.enabledProtections["Fire Protection"] and #nofire > 0 then
+					sendRaidReport(nofire, "Missing Fire Protection", false)
+				end
+				if self.db.enabledProtections["Frost Protection"] and #nofrost > 0 then
+					sendRaidReport(nofrost, "Missing Frost Protection", false)
+				end
+				if self.db.enabledProtections["Holy Protection"] and #noholy > 0 then
+					sendRaidReport(noholy, "Missing Holy Protection", false)
+				end
+				if self.db.enabledProtections["Nature Protection"] and #nonature > 0 then
+					sendRaidReport(nonature, "Missing Nature Protection", false)
+				end
+				if self.db.enabledProtections["Shadow Protection"] and #noshadow > 0 then
+					sendRaidReport(noshadow, "Missing Shadow Protection", false)
+				end
 			end
 		end
 	end
@@ -604,7 +925,7 @@ function f:ManualCheck()
 		                        (self.db.enabledProtections["Nature Protection"] and #nonature > 0) or 
 		                        (self.db.enabledProtections["Holy Protection"] and #noholy > 0))
 	end
-	return (self.db.checkFlasks and #noflask > 0) or (self.db.checkFood and #nofood > 0) or hasMissingProtection
+	return (self.db.checkFlasks and #noflask > 0) or (self.db.checkElixirs and #nobattleElixir > 0) or (self.db.checkGuardianElixirs and #noguardianElixir > 0) or (self.db.checkFood and #nofood > 0) or hasMissingProtection
 end
 
 _G.SpyingGnome = f

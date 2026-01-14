@@ -2,7 +2,8 @@ local addon = _G.SpyingGnome
 
 -- Use buff tables from buffs.lua (loaded first)
 local flasks = _G.SpyingGnomeFlasks or {}
-local elixirs = _G.SpyingGnomeElixirs or {}
+local battleElixirs = _G.SpyingGnomeBattleElixirs or {}
+local guardianElixirs = _G.SpyingGnomeGuardianElixirs or {}
 local protections = _G.SpyingGnomeProtections or {}
 
 -- Item ID mapping for tooltips (buffName -> itemID)
@@ -14,7 +15,7 @@ local itemIDs = {
 	["Flask of Overwhelming Might"] = 60423, -- Flask of Overwhelming Might
 	["Flask of Supreme Power"] = 13512, -- Flask of Supreme Power
 	["Flask of the Titans"] = 13510, -- Flask of the Titans
-	-- Elixirs
+	-- Battle Elixirs
 	["Dazzling Light"] = 62069, -- Elixir of Dazzling Light
 	["Greater Firepower"] = 21546, -- Elixir of Greater Firepower
 	["Greater Intellect"] = 9179, -- Elixir of Greater Intellect
@@ -24,6 +25,16 @@ local itemIDs = {
 	["Elixir of the Mongoose"] = 13452, -- Elixir of the Mongoose
 	["Elixir of the Sages"] = 13447, -- Elixir of the Sages
 	["Greater Arcane Elixir"] = 13454, -- Greater Arcane Elixir
+	["Elixir of Brute Force"] = 13453, -- Elixir of Brute Force
+	["Winterfall Firewater"] = 12820, -- Winterfall Firewater
+	["Ground Scorpok Assay"] = 8412, -- Ground Scorpok Assay (Strike of the Scorpok buff)
+	["R.O.I.D.S."] = 8410, -- R.O.I.D.S. (Rage of Ages buff)
+	-- Guardian Elixirs
+	["Elixir of Superior Defense"] = 13445, -- Elixir of Superior Defense (Greater Armor buff)
+	["Elixir of Fortitude"] = 3825, -- Elixir of Fortitude (Health II buff)
+	["Lung Juice Cocktail"] = 8411, -- Lung Juice Cocktail (Spirit of Boar buff)
+	["Cerebral Cortex Compound"] = 8423, -- Cerebral Cortex Compound (Infallible Mind buff)
+	["Gizzard Gum"] = 8424, -- Gizzard Gum (Spiritual Domination buff)
 	-- Protections
 	["Arcane Protection"] = 13461, -- Greater Arcane Protection Potion
 	["Fire Protection"] = 13457, -- Greater Fire Protection Potion
@@ -41,7 +52,7 @@ local displayNames = {
 	["Flask of Overwhelming Might"] = "Flask of Overwhelming Might |cffff8080(+90 Attack Power)|r",
 	["Flask of Supreme Power"] = "Flask of Supreme Power |cff00ffff(+70 Spell Damage)|r",
 	["Flask of the Titans"] = "Flask of the Titans |cff00ff00(+700 HP)|r",
-	-- Elixirs
+	-- Battle Elixirs
 	["Dazzling Light"] = "Elixir of Dazzling Light |cffffff00(+40 Holy Damage)|r",
 	["Greater Firepower"] = "Elixir of Greater Firepower |cffff8080(+40 Fire Damage)|r",
 	["Greater Intellect"] = "Elixir of Greater Intellect |cff0070dd(+25 Intellect)|r",
@@ -51,6 +62,17 @@ local displayNames = {
 	["Elixir of the Mongoose"] = "Elixir of the Mongoose |cff90ee90(+25 Agility, +2% Crit)|r",
 	["Elixir of the Sages"] = "Elixir of the Sages |cff0070dd(+18 Intellect, +18 Spirit)|r",
 	["Greater Arcane Elixir"] = "Greater Arcane Elixir |cff00ffff(+35 Spell Damage)|r",
+	["Elixir of Brute Force"] = "Elixir of Brute Force |cffff8080(+18 Strength, +18 Stamina)|r",
+	["Winterfall Firewater"] = "Winterfall Firewater |cffff8080(+35 Attack Power, +Size)|r",
+	["Ground Scorpok Assay"] = "Ground Scorpok Assay |cff00ff00(+25 Agility)|r",
+	["R.O.I.D.S."] = "R.O.I.D.S. |cffff8080(+25 Strength)|r",
+	
+	-- Guardian Elixirs
+	["Elixir of Superior Defense"] = "Elixir of Superior Defense |cffb0b0b0(+450 Armor)|r",
+	["Elixir of Fortitude"] = "Elixir of Fortitude |cff00ff00(+120 HP)|r",
+	["Lung Juice Cocktail"] = "Lung Juice Cocktail |cff00ff00(+25 Stamina)|r",
+	["Cerebral Cortex Compound"] = "Cerebral Cortex Compound |cff0070dd(+25 Intellect)|r",
+	["Gizzard Gum"] = "Gizzard Gum |cff0070dd(+25 Spirit)|r",
 }
 
 -- Create main buff config frame
@@ -125,14 +147,25 @@ local function initializeEnabledBuffs()
 		end
 	end
 	
-	-- Initialize enabledElixirs
+	-- Initialize enabledElixirs (Battle Elixirs)
 	if not addon.db.enabledElixirs then
 		addon.db.enabledElixirs = {}
 	end
-	-- Set all elixirs to enabled by default if not set
-	for elixirName, _ in pairs(elixirs) do
+	-- Set all battle elixirs to enabled by default if not set
+	for elixirName, _ in pairs(battleElixirs) do
 		if addon.db.enabledElixirs[elixirName] == nil then
 			addon.db.enabledElixirs[elixirName] = true
+		end
+	end
+	
+	-- Initialize enabledGuardianElixirs
+	if not addon.db.enabledGuardianElixirs then
+		addon.db.enabledGuardianElixirs = {}
+	end
+	-- Set all guardian elixirs to enabled by default if not set
+	for elixirName, _ in pairs(guardianElixirs) do
+		if addon.db.enabledGuardianElixirs[elixirName] == nil then
+			addon.db.enabledGuardianElixirs[elixirName] = true
 		end
 	end
 	
@@ -305,25 +338,78 @@ local function buildBuffConfigUI()
 		yOffset = yOffset + spacing
 	end
 	
-	-- Elixirs section
+	-- Battle Elixirs section
 	yOffset = yOffset + spacing -- Add some space between sections
-	local elixirsHeader = contentFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-	elixirsHeader:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 0, yOffset)
-	elixirsHeader:SetText("Elixirs")
-	elixirsHeader:SetTextColor(1, 1, 0.5, 1)
-	uiElements.elixirsHeader = elixirsHeader
+	local battleElixirsHeader = contentFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	battleElixirsHeader:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 0, yOffset)
+	battleElixirsHeader:SetText("Battle Elixirs")
+	battleElixirsHeader:SetTextColor(1, 1, 0.5, 1)
+	uiElements.battleElixirsHeader = battleElixirsHeader
 	yOffset = yOffset + spacing
 	
-	-- Sort elixir names for display
-	local elixirNames = {}
-	for name, _ in pairs(elixirs) do
-		table.insert(elixirNames, name)
+	-- Sort battle elixir names for display
+	local battleElixirNames = {}
+	local bottomElixirs = {"Ground Scorpok Assay", "R.O.I.D.S."}
+	local bottomElixirsSet = {}
+	for _, name in ipairs(bottomElixirs) do
+		bottomElixirsSet[name] = true
 	end
-	table.sort(elixirNames)
 	
-	for i, elixirName in ipairs(elixirNames) do
+	-- Add all elixirs except the bottom ones, then sort
+	for name, _ in pairs(battleElixirs) do
+		if not bottomElixirsSet[name] then
+			table.insert(battleElixirNames, name)
+		end
+	end
+	table.sort(battleElixirNames)
+	
+	-- Add bottom elixirs at the end
+	for _, name in ipairs(bottomElixirs) do
+		if battleElixirs[name] then
+			table.insert(battleElixirNames, name)
+		end
+	end
+	
+	for i, elixirName in ipairs(battleElixirNames) do
 		local check = createBuffCheckbox(elixirName, "Elixirs", contentFrame, yOffset)
-		uiElements["elixir_" .. elixirName] = check
+		uiElements["battleElixir_" .. elixirName] = check
+		yOffset = yOffset + spacing
+	end
+	
+	-- Guardian Elixirs section
+	yOffset = yOffset + spacing -- Add some space between sections
+	local guardianElixirsHeader = contentFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	guardianElixirsHeader:SetPoint("TOPLEFT", contentFrame, "TOPLEFT", 0, yOffset)
+	guardianElixirsHeader:SetText("Guardian Elixirs")
+	guardianElixirsHeader:SetTextColor(1, 1, 0.5, 1)
+	uiElements.guardianElixirsHeader = guardianElixirsHeader
+	yOffset = yOffset + spacing
+	
+	-- Sort guardian elixir names for display
+	local guardianElixirNames = {}
+	local bottomGuardianElixirs = {"Cerebral Cortex Compound", "Gizzard Gum"}
+	local bottomGuardianElixirsSet = {}
+	for _, name in ipairs(bottomGuardianElixirs) do
+		bottomGuardianElixirsSet[name] = true
+	end
+	
+	for name, _ in pairs(guardianElixirs) do
+		if not bottomGuardianElixirsSet[name] then
+			table.insert(guardianElixirNames, name)
+		end
+	end
+	table.sort(guardianElixirNames)
+	
+	-- Add bottom guardian elixirs at the end
+	for _, name in ipairs(bottomGuardianElixirs) do
+		if guardianElixirs[name] then
+			table.insert(guardianElixirNames, name)
+		end
+	end
+	
+	for i, elixirName in ipairs(guardianElixirNames) do
+		local check = createBuffCheckbox(elixirName, "GuardianElixirs", contentFrame, yOffset)
+		uiElements["guardianElixir_" .. elixirName] = check
 		yOffset = yOffset + spacing
 	end
 	

@@ -208,39 +208,83 @@ end
 		end
 	end)
 
-	local checkFlasks = newCheckbox("Check for missing flasks", "checkFlasks", false, contentFrame)
+	-- Main checkboxes for what to check
+	local checkFlasks = newCheckbox("Check for missing Flasks", "checkFlasks", false, contentFrame)
 	checkFlasks:SetPoint("TOPLEFT", statusPrint, "BOTTOMLEFT", -10, -4)
 	uiElements.checkFlasks = checkFlasks
 
-	local checkElixirs = newCheckbox("Check for missing elixirs", "checkElixirs", false, contentFrame)
-	checkElixirs:SetPoint("TOPLEFT", checkFlasks, "BOTTOMLEFT", 10, -1)
+	local checkElixirs = newCheckbox("Check for missing Battle Elixirs", "checkElixirs", false, contentFrame)
+	checkElixirs:SetPoint("TOPLEFT", checkFlasks, "BOTTOMLEFT", 0, -4)
 	uiElements.checkElixirs = checkElixirs
+	
+	local checkGuardianElixirs = newCheckbox("Check for missing Guardian Elixirs", "checkGuardianElixirs", false, contentFrame)
+	checkGuardianElixirs:SetPoint("TOPLEFT", checkElixirs, "BOTTOMLEFT", 0, -4)
+	uiElements.checkGuardianElixirs = checkGuardianElixirs
 
-	local checkFood = newCheckbox("Check for missing food buff", "checkFood", false, contentFrame)
-	checkFood:SetPoint("TOPLEFT", checkElixirs, "BOTTOMLEFT", -10, -4)
+	local checkFood = newCheckbox("Check for missing Food buff", "checkFood", false, contentFrame)
+	checkFood:SetPoint("TOPLEFT", checkGuardianElixirs, "BOTTOMLEFT", 0, -4)
 	uiElements.checkFood = checkFood
 
-	local checkProtection = newCheckbox("Check for missing protection buffs", "checkProtection", false, contentFrame)
+	local checkProtection = newCheckbox("Check for missing Protection buffs", "checkProtection", false, contentFrame)
 	checkProtection:SetPoint("TOPLEFT", checkFood, "BOTTOMLEFT", 0, -4)
 	uiElements.checkProtection = checkProtection
 
-	-- Add handler to checkFlasks to uncheck checkElixirs when parent is unchecked
+	-- Mutual exclusivity between Flasks and Elixirs:
+	-- If Flasks is checked, automatically uncheck both Battle and Guardian Elixirs
+	-- If either Elixir checkbox is checked, automatically uncheck Flasks
+	
+	-- Handler for Flasks checkbox
 	local originalFlasksOnClick = checkFlasks:GetScript("OnClick")
 	checkFlasks:SetScript("OnClick", function(self, button, down)
 		-- Call original handler first
 		if originalFlasksOnClick then
 			originalFlasksOnClick(self, button, down)
 		end
-		-- If parent is now unchecked, uncheck checkElixirs
-		if not self:GetChecked() then
+		if self:GetChecked() then
+			-- Flasks enabled: disable both Elixir checks
 			if checkElixirs and addon and addon.db then
 				checkElixirs:SetChecked(false)
 				addon.db.checkElixirs = false
 			end
+			if checkGuardianElixirs and addon and addon.db then
+				checkGuardianElixirs:SetChecked(false)
+				addon.db.checkGuardianElixirs = false
+			end
 		end
 	end)
 
-
+	-- Handler for Battle Elixirs checkbox
+	local originalElixirsOnClick = checkElixirs:GetScript("OnClick")
+	checkElixirs:SetScript("OnClick", function(self, button, down)
+		-- Call original handler first
+		if originalElixirsOnClick then
+			originalElixirsOnClick(self, button, down)
+		end
+		-- If Battle Elixirs is now checked, uncheck Flasks
+		if self:GetChecked() then
+			if checkFlasks and addon and addon.db then
+				checkFlasks:SetChecked(false)
+				addon.db.checkFlasks = false
+			end
+		end
+	end)
+	
+	-- Handler for Guardian Elixirs checkbox
+	local originalGuardianOnClick = checkGuardianElixirs:GetScript("OnClick")
+	checkGuardianElixirs:SetScript("OnClick", function(self, button, down)
+		-- Call original handler first
+		if originalGuardianOnClick then
+			originalGuardianOnClick(self, button, down)
+		end
+		-- If Guardian Elixirs is now checked, uncheck Flasks
+		if self:GetChecked() then
+			if checkFlasks and addon and addon.db then
+				checkFlasks:SetChecked(false)
+				addon.db.checkFlasks = false
+			end
+		end
+	end)
+	
 	-- Helper function to make a checkbox dependent on enableSpyingGnome
 	local function makeDependentOnMaster(checkbox)
 		if not checkbox then return end
@@ -259,26 +303,12 @@ end
 		end)
 	end
 
-	-- Make checkElixirs dependent on checkFlasks
-	local originalElixirsOnClick = checkElixirs:GetScript("OnClick")
-	checkElixirs:SetScript("OnClick", function(self, button, down)
-		-- Check if parent (checkFlasks) is enabled
-		if not (checkFlasks and checkFlasks:GetChecked()) then
-			-- Parent is disabled, prevent toggle by reverting state
-			self:SetChecked(not self:GetChecked())
-			return
-		end
-		-- Parent is enabled, allow normal click behavior
-		if originalElixirsOnClick then
-			originalElixirsOnClick(self, button, down)
-		end
-	end)
-
 	-- Make all checkboxes dependent on enableSpyingGnome (except enableSpyingGnome itself)
 	makeDependentOnMaster(statusPrintInRaidChat)
 	makeDependentOnMaster(statusPrint)
 	makeDependentOnMaster(checkFlasks)
 	makeDependentOnMaster(checkElixirs)
+	makeDependentOnMaster(checkGuardianElixirs)
 	makeDependentOnMaster(checkFood)
 	makeDependentOnMaster(checkProtection)
 
@@ -288,12 +318,7 @@ end
 	checkButton:SetHeight(22)
 	checkButton:SetText("Perform check")
 	-- Position below checkProtection, centered horizontally on contentFrame
-	-- Get the Y position from checkProtection (minimal spacing)
-	local protectionBottom = checkProtection:GetBottom()
-	local contentTop = contentFrame:GetTop()
-	local yOffset = protectionBottom - contentTop + 20
-	-- Center horizontally: contentFrame is 260px, button is 180px, so center offset is 0 (TOP anchor centers)
-	checkButton:SetPoint("TOP", contentFrame, "TOP", 0, yOffset)
+	checkButton:SetPoint("TOPLEFT", checkProtection, "BOTTOMLEFT", 40, -25)
 	checkButton:Show()
 	uiElements.checkButton = checkButton
 
@@ -319,6 +344,7 @@ end
 				{box = statusPrint, key = "statusPrintAtReady"},
 				{box = checkFlasks, key = "checkFlasks"},
 				{box = checkElixirs, key = "checkElixirs"},
+				{box = checkGuardianElixirs, key = "checkGuardianElixirs"},
 				{box = checkFood, key = "checkFood"},
 				{box = checkProtection, key = "checkProtection"}
 			}
@@ -342,10 +368,99 @@ end
 		if not (addon and addon.db and addon.db.enableSpyingGnome) then
 			return
 		end
+		
+		-- Only operate in raid groups (addon is raid-only)
+		if GetNumRaidMembers() == 0 then
+			print("SpyingGnome: You are not in a raid party.")
+			return
+		end
+		
 		if addon and addon.ManualCheck then
+			-- Check if all checks are disabled
+			local allChecksDisabled =
+				not addon.db.checkFlasks and
+				not addon.db.checkElixirs and
+				not addon.db.checkGuardianElixirs and
+				not addon.db.checkFood and
+				not addon.db.checkProtection
+			
+			if allChecksDisabled then
+				print("[SG]: You have not selected any checks. Check your configuration.")
+				return
+			end
+			
 			local hasIssues = addon:ManualCheck()
 			if not hasIssues then
-				print("SpyingGnome: All raid members have flasks, food, and protection buffs!")
+				-- Verify that enabled checks actually have items selected in Configuration
+				local hasValidChecks = true
+				
+				-- Flasks
+				if addon.db.checkFlasks then
+					local hasEnabledFlasks = false
+					if addon.db.enabledFlasks and _G.SpyingGnomeFlasks then
+						for flaskName, _ in pairs(_G.SpyingGnomeFlasks) do
+							if addon.db.enabledFlasks[flaskName] ~= false then
+								hasEnabledFlasks = true
+								break
+							end
+						end
+					end
+					if not hasEnabledFlasks then
+						hasValidChecks = false
+					end
+				end
+				
+				-- Battle Elixirs
+				if addon.db.checkElixirs then
+					local hasEnabledBattleElixirs = false
+					if addon.db.enabledElixirs and _G.SpyingGnomeBattleElixirs then
+						for elixirName, _ in pairs(_G.SpyingGnomeBattleElixirs) do
+							if addon.db.enabledElixirs[elixirName] ~= false then
+								hasEnabledBattleElixirs = true
+								break
+							end
+						end
+					end
+					if not hasEnabledBattleElixirs then
+						hasValidChecks = false
+					end
+				end
+				
+				-- Guardian Elixirs
+				if addon.db.checkGuardianElixirs then
+					local hasEnabledGuardianElixirs = false
+					if addon.db.enabledGuardianElixirs and _G.SpyingGnomeGuardianElixirs then
+						for elixirName, _ in pairs(_G.SpyingGnomeGuardianElixirs) do
+							if addon.db.enabledGuardianElixirs[elixirName] ~= false then
+								hasEnabledGuardianElixirs = true
+								break
+							end
+						end
+					end
+					if not hasEnabledGuardianElixirs then
+						hasValidChecks = false
+					end
+				end
+				
+				-- Protections
+				if addon.db.checkProtection then
+					local hasEnabledProtections = false
+					if addon.db.enabledProtections and _G.SpyingGnomeProtections then
+						for protName, _ in pairs(_G.SpyingGnomeProtections) do
+							if addon.db.enabledProtections[protName] == true then
+								hasEnabledProtections = true
+								break
+							end
+						end
+					end
+					if not hasEnabledProtections then
+						hasValidChecks = false
+					end
+				end
+				
+				if hasValidChecks then
+					print("SpyingGnome: All raiders meet the configured consumable criteria.")
+				end
 			end
 		else
 			print("SpyingGnome: Addon not loaded yet. Please wait a moment and try again.")
@@ -360,7 +475,7 @@ end
 	hint:SetJustifyH("CENTER")
 	hint:SetJustifyV("TOP")
 	hint:SetNonSpaceWrap(true)
-	hint:SetText("|cff44ff44Use the button above to manually check for missing flasks, elixirs, food, and protection buffs.|r")
+	hint:SetText("|cff44ff44Use the button above to manually check for missing flasks, battle elixirs, guardian elixirs, food, and protection buffs.|r")
 	hint:Show()
 	uiElements.hint = hint
 
