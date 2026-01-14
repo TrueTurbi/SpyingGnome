@@ -1,74 +1,276 @@
 # SpyingGnome
-A fully configurable Flask/Elixir/Food/Prot buff checker for Project Epoch.
 
-<img width="275" height="450" alt="image" src="https://github.com/user-attachments/assets/0cc6ded5-87d9-42a7-9e30-f0ce7be02709" /> <img width="330" height="500" alt="image" src="https://github.com/user-attachments/assets/f129e641-1eee-462b-bf9b-57e22844aa0e" />
+A fully configurable consumable checker for your raids. SpyingGnome helps raid leaders and officers ensure everyone in the raid has the proper flasks, elixirs, food buffs, and protection potions before engaging bosses.
 
-The addon is a configurable buff checker for your raids. This addon will only work, if you're in a raid group.
+## What Does SpyingGnome Do?
 
-**NOTE:** Raid Chat printing is limited to Raid Leader and Raid Officer roles to avoid clutter. Only Raid Leader OR Raid Officer should have raid chat printing enabled.
+SpyingGnome automatically checks every member of your raid group to see if they have the consumables you've configured. It can check for:
 
-# Documentation
+- **Flasks** - The powerful 2-hour consumables (like Flask of the Titans, Flask of Supreme Power, etc.)
+- **Battle Elixirs** - Offensive elixirs that boost your damage (like Elixir of the Mongoose, Elixir of Giants, etc.)
+- **Guardian Elixirs** - Defensive elixirs that boost your survivability (like Elixir of Superior Defense, Elixir of Fortitude, etc.)
+- **Food Buffs** - Any food that provides a "Well Fed" or other food-related buff
+- **Protection Potions** - Resistance potions for specific damage types (Fire, Frost, Arcane, Nature, Shadow, Holy)
 
-To use this addon, use commands:
+The addon will tell you exactly which players are missing which consumables, making it easy to ensure your raid is properly prepared.
 
-**/sg**
+## Getting Started
 
-**/spyinggnome**
+### Opening the Addon
 
-You always get a print out in chat (Unless you have "SpyingGnome Enabled" unchecked):
+Type either of these commands in chat to open the SpyingGnome configuration window:
 
-<img width="272" height="35" alt="image" src="https://github.com/user-attachments/assets/24bb80cc-733b-4518-bd18-04b84ff9fc37" />
+- `/sg`
+- `/spyinggnome`
 
-And if you check "Enable Status Report Printing in Raid Chat" and "Print to raid chat after a ready check", you can do a check with a raid chat announcement by using the button or ready check in /sg:
+You'll see the main configuration window with all the options:
 
-<img width="322" height="316" alt="image" src="https://github.com/user-attachments/assets/b7b18abc-4e71-4135-a9fc-7f9c1ae43641" />
+![Main Configuration Window](https://github.com/user-attachments/assets/0cc6ded5-87d9-42a7-9e30-f0ce7be02709)
 
-Button in /sg:
+### Basic Setup
 
-<img width="448" height="37" alt="image" src="https://github.com/user-attachments/assets/5dfeb307-5822-4bad-896b-5b531468671a" />
+1. **Enable SpyingGnome** - Make sure this checkbox is checked (it's the master switch for the entire addon)
+2. **Choose What to Check** - Select which consumables you want to monitor:
+   - Check for missing Flasks
+   - Check for missing Battle Elixirs
+   - Check for missing Guardian Elixirs
+   - Check for missing Food buff
+   - Check for missing Protection buffs
 
-Ready check status print after ready check is complete:
+3. **Configure Specific Items** - Click the red "Configuration" button at the top to choose exactly which flasks, elixirs, and protections to check for
 
-<img width="448" height="37" alt="image" src="https://github.com/user-attachments/assets/52167c98-dc24-4f0c-9027-96cc1984da21" />
+4. **Perform a Check** - Click the "Perform check" button at the bottom to manually check your raid
 
-Without "Enable Status Report Printing in Raid Chat" checked, pressing "Perform check":
+## How It Works
 
-<img width="336" height="39" alt="image" src="https://github.com/user-attachments/assets/32f2981e-90ca-4452-b62f-2f252f99e72e" />
+### Manual Checks
 
-I also added protection potions, to check if everyone has pre-potted. Added all protection types for possible future-proofing:
+When you click the "Perform check" button, SpyingGnome will:
 
-<img width="229" height="206" alt="image" src="https://github.com/user-attachments/assets/c539dd27-fd28-4fde-a590-87d13b5e2d53" />
-<img width="264" height="34" alt="image" src="https://github.com/user-attachments/assets/daa4f397-d771-45fe-ba98-62c42e7119fe" />
+1. Check every player in your raid group
+2. Look at all their active buffs
+3. Compare them against your configured consumables
+4. Report any missing items
 
-After clicking the button in /sg:
+**Important:** The addon only works when you're in a raid group. If you try to use it while not in a raid, you'll see a message telling you that you need to be in a raid party.
 
-<img width="409" height="36" alt="image" src="https://github.com/user-attachments/assets/0c54fd6c-a6ea-4f3d-9272-9be33573b6b5" />
+### Automatic Checks After Ready Check
 
-Now also supporting Elixirs (Battle Elixirs and Guardian Elixirs separately):
+If you enable "Print to raid chat after a ready check", SpyingGnome will automatically check your raid whenever a ready check completes. This is perfect for quickly verifying everyone is prepared right before a pull!
 
-<img width="264" height="79" alt="image" src="https://github.com/user-attachments/assets/81429da6-e048-451e-9964-54c6bd3d0c21" />
+### Where You'll See Messages
 
-With a new report, if Guardian and Battle Elixir check enabled:
+SpyingGnome can show you results in two places:
 
-<img width="476" height="37" alt="image" src="https://github.com/user-attachments/assets/e0dffa24-847f-411f-be0d-81ae4e930d61" />
+1. **Your Chat Window** - You'll always see messages in your personal chat (unless you've disabled SpyingGnome entirely). These messages show you who's missing what, with player names in color.
 
+2. **Raid Chat** - If you're a Raid Leader or Raid Officer and have "Enable Status Report Printing in Raid Chat" checked, the addon will INSTEAD announce missing consumables to the entire raid.
 
-# Contact
+**Note:** Only Raid Leaders and Officers can send messages to raid chat. If you're a regular raider, you'll only see messages in your personal chat window.
 
-If some flasks are missing from the list, contact me below!
-Any suggestions for improvements are welcome!
+## Configuration Guide
 
-You may contact me in-game or through Discord:
+### Main Configuration Window
 
-**In-game:** Mightbeard
+The main window (`/sg`) has several important options:
 
+- **Enable SpyingGnome** - Master switch. If unchecked, the addon won't do anything.
+- **Enable Status Report Printing in Raid Chat** - Allows the addon to send messages to raid chat (Raid Leaders/Officers only)
+- **Print to raid chat after a ready check** - Automatically checks and reports after ready checks complete
+- **Check for missing Flasks** - Enable checking for flasks
+- **Check for missing Battle Elixirs** - Enable checking for battle elixirs
+- **Check for missing Guardian Elixirs** - Enable checking for guardian elixirs
+- **Check for missing Food buff** - Enable checking for food buffs
+- **Check for missing Protection buffs** - Enable checking for protection potions
+
+### Detailed Configuration
+
+Click the red "Configuration" button to open the detailed consumable selection window:
+
+![Buff Configuration Window](https://github.com/user-attachments/assets/f129e641-1eee-462b-bf9b-57e22844aa0e)
+
+Here you can:
+
+- **Select Specific Flasks** - Choose which flasks to check for (Flask of the Titans, Flask of Supreme Power, etc.)
+- **Select Battle Elixirs** - Choose which battle elixirs to check for (Elixir of the Mongoose, Elixir of Giants, etc.)
+- **Select Guardian Elixirs** - Choose which guardian elixirs to check for (Elixir of Superior Defense, Elixir of Fortitude, etc.)
+- **Select Protection Types** - Choose which protection potions to check for (Fire Protection, Frost Protection, etc.)
+
+Each consumable shows its stat bonuses in colored text. You can hover over protection potions to see detailed item information in a tooltip.
+
+**Important:** The addon only checks for consumables that are both:
+1. Enabled in the main window (e.g., "Check for missing Flasks" is checked)
+2. Selected in the Configuration window (e.g., "Flask of the Titans" is checked)
+
+If you enable "Check for missing Flasks" but don't select any specific flasks in Configuration, you'll get a message telling you that no flasks are selected.
+
+### Flasks vs Elixirs
+
+Flasks and Elixirs are mutually exclusive - you can't have both active at the same time. SpyingGnome reflects this:
+
+- If you check "Check for missing Flasks", the Battle Elixirs and Guardian Elixirs checkboxes will automatically uncheck
+- If you check either "Check for missing Battle Elixirs" or "Check for missing Guardian Elixirs", the Flasks checkbox will automatically uncheck
+
+This prevents confusion and ensures you're checking for the right type of consumable.
+
+## Understanding the Messages
+
+### Personal Chat Messages
+
+When you perform a check, you'll see messages like this in your chat:
+
+```
+[SG] Missing food: Player1, Player2.
+[SG] Missing flask: Player1, Player2.
+```
+
+These messages show (Depending on your configuration):
+- What's missing (food, flask, elixir, protection buffs)
+- Which players are missing that consumable (names in color)
+
+### Raid Chat Messages
+
+If you're a Raid Leader or Officer with raid chat enabled, messages will appear in raid chat like this (Given, that you choose "Enable Status Printing to Raid Chat):
+
+```
+[R] [RaidLeader1]: [SG] Missing flask: Player1, Player2
+[R] [RaidLeader1]: [SG] Missing food buff: Player1, Player2
+```
+
+The `[SG]` prefix identifies these as SpyingGnome messages.
+
+### Protection Buff Messages
+
+When checking for protection potions, you'll see these two types of messages for each protection type that's enabled:
+
+```
+[SG] Missing Fire Protection: Player1.
+[R] [RaidLeader1]: [SG] Missing Fire Protection: Player1.
+```
+
+### Elixir Messages
+
+Battle Elixirs and Guardian Elixirs are reported separately:
+
+```
+[R] [RaidLeader1]: [SG] Missing Battle Elixir: Player1
+[R] [RaidLeader1]: [SG] Missing Guardian Elixir: Player1, Player2
+```
+
+- In this case, Player 2 has a Battle Elixir buff, but not a Guardian Elixir buff.
+
+### Success Message
+
+When everyone has all the required consumables, you'll see:
+
+```
+[SG] All raiders meet the configured consumable criteria.
+```
+
+This message appears in raid chat (if enabled) when you're a Raid Leader or Officer.
+
+## Tips and Best Practices
+
+### For Raid Leaders and Officers
+
+1. **Only One Person Should Have Raid Chat Enabled** - To avoid spam, only the Raid Leader or one Officer should have "Enable Status Report Printing in Raid Chat" checked.
+
+2. **Configure Before Raid** - Set up your consumable preferences before the raid starts. Decide which flasks/elixirs and protections you want to require.
+
+3. **Use Ready Check Integration** - Enable "Print to raid chat after a ready check" to automatically check consumables right before pulls.
+
+## Supported Consumables
+
+### Flasks
+- Flask of Chromatic Resistance
+- Flask of Distilled Wisdom
+- Flask of the Titans
+- Flask of Overwhelming Might
+- Flask of Supreme Power
+
+### Battle Elixirs
+- Elixir of the Mongoose
+- Elixir of Shadow Power
+- Elixir of Greater Firepower
+- Elixir of the Giants
+- Elixir of Pure Arcane Power
+- Elixir of Dazzling Light
+- Greater Arcane Elixir
+- Elixir of Brute Force
+- Winterfall Firewater
+- Ground Scorpok Assay
+- R.O.I.D.S.
+- Juju Power
+- Juju Might
+
+### Guardian Elixirs
+- Elixir of Greater Intellect
+- Elixir of the Sages
+- Elixir of Superior Defense
+- Elixir of Fortitude
+- Lung Juice Cocktail
+- Cerebral Cortex Compound
+- Gizzard Gum
+- Juju Guile
+
+### Food Buffs
+- Well Fed (any food that provides this buff)
+- Nightfin Soup (Mana Regeneration)
+- Protein Shake (Strength)
+- Grilled Squid (Increased Agility)
+- Rumsey Rum Black Label
+
+### Protection Potions
+- Arcane Protection
+- Fire Protection
+- Frost Protection
+- Holy Protection
+- Nature Protection
+- Shadow Protection
+
+- If any are missing that you know of, please contact me below.
+
+## Special Features
+
+### Tooltips
+
+Hover over any of the flasks/elixirs/protections mentioned in the Configuration window to see the respective item's tooltip.
+
+## Troubleshooting
+
+### "You are not in a raid party"
+- Make sure you're actually in a raid group, not just a party.
+
+### "You have not selected any [consumable type] to check for"
+- You've enabled checking for a consumable type (like Flasks) in the main window, but haven't selected any specific items in the Configuration window.
+- Go to Configuration and check the specific flasks/elixirs/protections you want to monitor.
+
+### Messages Not Appearing in Raid Chat
+- Make sure you're a Raid Leader or Raid Officer (regular raiders can't send to raid chat).
+- Check that "Enable Status Report Printing in Raid Chat" is enabled.
+- Verify that "Enable SpyingGnome" is checked (the master switch).
+
+### Messages Appearing Twice
+- This shouldn't happen, but if it does, make sure only one person in the raid has raid chat printing enabled.
+
+## Contact & Support
+
+If you find that some flasks, elixirs, or other consumables are missing from the list, or if you have suggestions for improvements, please reach out!
+
+**In-game:** Mightbeard  
 **Discord:** Turbi
 
 **Happy raiding!**
 
-**Special Thanks to:** Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Surcouf, Thraxeus, Eeveel, Kybalion & the Kezan Community Discord
+### Special Thanks
 
-# SpyingGnome v1.3.1
+Thank you to all the contributors and testers: Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Surcouf, Thraxeus, Eeveel, Kybalion & the Kezan Community Discord
+
+---
+
+## Version History
+
+## SpyingGnome v1.3.1
 
 ### New Features
 - **New Elixirs Added**:
@@ -81,7 +283,10 @@ You may contact me in-game or through Discord:
 ### Interface Changes
 - Added version number (v1.3.1) to the addon name in the main configuration window.
 
-# SpyingGnome v1.3
+### Other Changes
+- Readme -file cleanup, more sensible and easier to read. Proper documentation.
+
+## SpyingGnome v1.3
 
 ### New Features
 - **Guardian Elixirs Support**: Added separate tracking for Guardian Elixirs
@@ -102,31 +307,7 @@ You may contact me in-game or through Discord:
   - Grilled Squid
 - A second gnome has made an appearance! _(Thank you Surcouf!)_
 
-### Interface Changes
-- Renamed "Check for missing elixirs" to "Check for missing Battle Elixirs"
-- Added new "Check for missing Guardian Elixirs" checkbox
-- Updated checkbox labels with proper capitalization
-- Added tooltips to Protection buffs (hover to see item details)
-- Reordered elixirs in Configuration window: Ground Scorpok Assay and R.O.I.D.S. appear at the bottom of Battle Elixirs, Cerebral Cortex Compound and Gizzard Gum appear at the bottom of Guardian Elixirs
-
-### Message Updates
-- Debug messages now include [SG] prefix
-- Added separate messages for Battle Elixirs and Guardian Elixirs
-- Changed "Missing Flask" to "Missing flask:" in all messages
-- Updated success message: "All raiders meet the configured consumable criteria"
-- Added warning when no checks are selected: "You have not selected any checks. Check your configuration"
-- Added message when not in raid: "You are not in a raid party"
-
-### Behavior Changes
-- **Mutual Exclusivity**: Flasks and Elixirs checkboxes are now mutually exclusive - checking one automatically unchecks the other
-  - If you check "Check for missing Flasks", Battle Elixirs and Guardian Elixirs are automatically unchecked
-  - If you check "Check for missing Battle Elixirs" or "Check for missing Guardian Elixirs", Flasks is automatically unchecked
-- Debug printing now respects "Enable Status Report Printing in Raid Chat" setting (prints to debug if enabled but player is not raid leader/officer)
-- Status reports print in order: Flask, Battle Elixir, Guardian Elixir, Food, Protection
-- Battle Elixirs and Guardian Elixirs are checked and reported independently
-- Success message sent to raid chat when all checks pass (raid leader/officer only)
-
-# SpyingGnome v1.2 / The Great Raidening
+## SpyingGnome v1.2 / The Great Raidening
 - UI rework, added "Configuration" menu.
 
 <img width="275" height="425" alt="image" src="https://github.com/user-attachments/assets/9a9ff611-0fec-4025-87eb-e1c44558b1bf" />
@@ -160,7 +341,7 @@ You may contact me in-game or through Discord:
 
 - Updated localization to match Elixir criteria in status reports
 
-# SpyingGnome v1.1
+## SpyingGnome v1.1
 - Adjustments to the UI, added a "Enable SpyingGnome" checkbox.
 
 ![Ascension_LVTcBvfIZZ](https://github.com/user-attachments/assets/e9eaeed6-38f0-44de-83f6-3780b1d0505d)
