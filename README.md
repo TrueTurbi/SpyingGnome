@@ -1,6 +1,6 @@
 # SpyingGnome
 
-A fully configurable consumable checker for your raids. SpyingGnome helps raid leaders and officers ensure everyone in the raid has the proper flasks, elixirs, food buffs, and protection potions before engaging bosses.
+A fully configurable consumable checker for your raids.
 
 ## What Does SpyingGnome Do?
 
