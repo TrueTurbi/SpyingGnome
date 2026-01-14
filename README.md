@@ -68,6 +68,19 @@ You may contact me in-game or through Discord:
 
 **Special Thanks to:** Norelenilia, Skarr, Kerian, Nickfury, Kazlyn, Surcouf, Thraxeus, Eeveel, Kybalion & the Kezan Community Discord
 
+# SpyingGnome v1.3.1
+
+### New Features
+- **New Elixirs Added**:
+  - Juju Power (Battle Elixir)
+  - Juju Might (Battle Elixir)
+  - Juju Guile (Guardian Elixir)
+- **New Food Buffs Added**:
+  - Rumsey Rum Black Label
+
+### Interface Changes
+- Added version number (v1.3.1) to the addon name in the main configuration window.
+
 # SpyingGnome v1.3
 
 ### New Features
