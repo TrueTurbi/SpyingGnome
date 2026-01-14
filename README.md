@@ -256,8 +256,9 @@ Hover over any of the flasks/elixirs/protections mentioned in the Configuration 
 
 If you find that some flasks, elixirs, or other consumables are missing from the list, or if you have suggestions for improvements, please reach out!
 
-**In-game:** Mightbeard  
-**Discord:** Turbi
+<img width="90" height="23" alt="Epoch_Logo" src="https://github.com/user-attachments/assets/bf507725-5c0e-4dec-aae6-54784510eaa4" />Mightbeard _(Kezan)_ 
+
+<img width="32" height="32" alt="discordlogo" src="https://github.com/user-attachments/assets/b12f7d5c-1e58-405a-a2d0-87358e452cd8" />Turbi
 
 **Happy raiding!**
 
