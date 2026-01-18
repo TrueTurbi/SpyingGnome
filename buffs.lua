@@ -15,7 +15,7 @@ _G.SpyingGnomeBuffAliases = {
 	},
 	["Flask of Supreme Power"] = {
 		["Flask of Supreme Power"] = true,
-		["Supreme Power"] = true,
+	["Supreme Power"] = true,
 	},
 	["Elixir of Superior Defense"] = {
 		["Elixir of Superior Defense"] = true,
@@ -379,11 +379,13 @@ local function inspectRaid()
 				noflask[#noflask+1] = name
 			end
 			-- Check for Battle Elixirs separately if checkElixirs is enabled
-			if f.db.checkElixirs and not battleElixir then
+			-- Allow flask to satisfy battle elixir requirement
+			if f.db.checkElixirs and not battleElixir and not flask then
 				nobattleElixir[#nobattleElixir+1] = name
 			end
 			-- Check for Guardian Elixirs separately if checkGuardianElixirs is enabled
-			if f.db.checkGuardianElixirs and not guardianElixir then
+			-- Allow flask to satisfy guardian elixir requirement
+			if f.db.checkGuardianElixirs and not guardianElixir and not flask then
 				noguardianElixir[#noguardianElixir+1] = name
 			end
 			-- Check for protection buffs if checkProtection is enabled
@@ -417,7 +419,8 @@ local function inspectRaid()
 				                        (f.db.enabledProtections["Nature Protection"] and not nature) or 
 				                        (f.db.enabledProtections["Holy Protection"] and not holy))
 			end
-			if (f.db.checkFood and not food) or (f.db.checkFlasks and not flask) or (f.db.checkElixirs and not battleElixir) or (f.db.checkGuardianElixirs and not guardianElixir) or hasMissingProtection then 
+			-- Allow flask to satisfy elixir checks in recheck logic
+			if (f.db.checkFood and not food) or (f.db.checkFlasks and not flask) or (f.db.checkElixirs and not battleElixir and not flask) or (f.db.checkGuardianElixirs and not guardianElixir and not flask) or hasMissingProtection then 
 				recheck[#recheck+1] = name 
 			end
 		end
@@ -551,7 +554,7 @@ local function printStatusReport()
 				coloredGuardianElixirList[#coloredGuardianElixirList+1] = getColoredName(player)
 			end
 			print("[SG] Missing Guardian Elixir: " .. table.concat(coloredGuardianElixirList, ", ") .. ".")
-		end
+	end
 	end
 	
 	if f.db.checkFood and #nofood > 0 then
@@ -729,11 +732,13 @@ function f:READY_CHECK_FINISHED()
 				noflask[#noflask+1] = player
 			end
 			-- Check for Battle Elixirs separately if checkElixirs is enabled
-			if self.db.checkElixirs and not battleElixir then
+			-- Allow flask to satisfy battle elixir requirement
+			if self.db.checkElixirs and not battleElixir and not flask then
 				nobattleElixir[#nobattleElixir+1] = player
 			end
 			-- Check for Guardian Elixirs separately if checkGuardianElixirs is enabled
-			if self.db.checkGuardianElixirs and not guardianElixir then
+			-- Allow flask to satisfy guardian elixir requirement
+			if self.db.checkGuardianElixirs and not guardianElixir and not flask then
 				noguardianElixir[#noguardianElixir+1] = player
 			end
 			-- Check for protection buffs if checkProtection is enabled
