@@ -270,6 +270,11 @@ Thank you to all the contributors and testers: Norelenilia, Skarr, Kerian, Nickf
 
 ## Version History
 
+## SpyingGnome v1.3.2
+
+### Behavior Changes
+- **Flasks Count as Elixirs**: Battle Elixir and Guardian Elixir checks now also accept flasks as valid. Since flasks and elixirs are mutually exclusive in-game, players with a flask will now pass both Battle Elixir and Guardian Elixir checks, making the addon work better for raids that use flasks instead of elixirs.
+
 ## SpyingGnome v1.3.1
 
 ### New Features
