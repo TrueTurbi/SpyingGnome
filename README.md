@@ -212,6 +212,7 @@ This message appears in raid chat (if enabled) when you're a Raid Leader or Offi
 - Cerebral Cortex Compound
 - Gizzard Gum
 - Juju Guile
+- Starlight Gem
 
 ### Food Buffs
 - Well Fed (any food that provides this buff)
