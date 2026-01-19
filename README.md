@@ -275,6 +275,10 @@ Thank you to all the contributors and testers: Norelenilia, Skarr, Kerian, Nickf
 ### Behavior Changes
 - **Flasks Count as Elixirs**: Battle Elixir and Guardian Elixir checks now also accept flasks as valid. Since flasks and elixirs are mutually exclusive in-game, players with a flask will now pass both Battle Elixir and Guardian Elixir checks, making the addon work better for raids that use flasks and elixirs.
 
+### New Guardian Elixirs
+- **Starlight Gem (+250 HP)**: Added support for checking Starlight Gem, a Guardian Elixir that provides +250 HP.
+
+
 ## SpyingGnome v1.3.1
 
 ### New Features
