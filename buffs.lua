@@ -92,6 +92,7 @@ _G.SpyingGnomeGuardianElixirs = {
 	["Cerebral Cortex Compound"] = true,
 	["Gizzard Gum"] = true,
 	["Juju Guile"] = true,
+	["Starlight Gem"] = true,
 }
 
 -- Local references for convenience

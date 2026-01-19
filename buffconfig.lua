@@ -38,6 +38,7 @@ local itemIDs = {
 	["Cerebral Cortex Compound"] = 8423, -- Cerebral Cortex Compound (Infallible Mind buff)
 	["Gizzard Gum"] = 8424, -- Gizzard Gum (Spiritual Domination buff)
 	["Juju Guile"] = 12458, -- Juju Guile (Juju Guile buff)
+	["Starlight Gem"] = 60786, -- Starlight Gem
 	-- Protections
 	["Arcane Protection"] = 13461, -- Greater Arcane Protection Potion
 	["Fire Protection"] = 13457, -- Greater Fire Protection Potion
@@ -79,6 +80,7 @@ local displayNames = {
 	["Cerebral Cortex Compound"] = "Cerebral Cortex Compound |cff0070dd(+25 Intellect)|r",
 	["Gizzard Gum"] = "Gizzard Gum |cff0070dd(+25 Spirit)|r",
 	["Juju Guile"] = "Juju Guile |cff0070dd(+30 Intellect)|r",
+	["Starlight Gem"] = "Starlight Gem |cff00ff00(+250 HP)|r",
 }
 
 -- Create main buff config frame
@@ -393,7 +395,7 @@ local function buildBuffConfigUI()
 	
 	-- Sort guardian elixir names for display
 	local guardianElixirNames = {}
-	local bottomGuardianElixirs = {"Cerebral Cortex Compound", "Gizzard Gum", "Juju Guile"}
+	local bottomGuardianElixirs = {"Cerebral Cortex Compound", "Gizzard Gum", "Juju Guile", "Starlight Gem"}
 	local bottomGuardianElixirsSet = {}
 	for _, name in ipairs(bottomGuardianElixirs) do
 		bottomGuardianElixirsSet[name] = true
